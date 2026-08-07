@@ -3,6 +3,8 @@ os.environ["GLOG_minloglevel"] = "2"
 # Sets envioroment variable befoe MP import to help supress unncesseary logs
 
 import time
+import struct
+import socket
 import cv2 # Open CV
 import mediapipe as mp
 from mediapipe.tasks import python # New version of mp.solutions
@@ -11,6 +13,16 @@ from mediapipe.tasks.python import vision
 
 MODEL_PATH = "hand_landmarker.task"
 # The trained model file
+
+# --- UDP setup for sending landmarks to Blender ---
+UDP_IP = "127.0.0.1"  # localhost -- both programs run on this machine
+UDP_PORT = 5052
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+# One UDP socket, created once, reused every frame
+
+NUM_FLOATS = 21 * 3
+# 21 landmarks per hand, each with x, y, z -> 63 floats
 
 BaseOptions = mp.tasks.BaseOptions
 HandLandmarker = mp.tasks.vision.HandLandmarker
@@ -95,7 +107,21 @@ def main():
 
             if result.hand_landmarks: # Empty list if no hand was detected this frame
                 draw_landmarks(frame, result.hand_landmarks, width, height)
-            # Only draws if at least one hand is detected
+                # Only draws if at least one hand is detected
+
+                first_hand = result.hand_landmarks[0]
+                # Take just the first detected hand for this first test
+
+                flat_values = []
+                for landmark in first_hand:
+                    flat_values.append(landmark.x)
+                    flat_values.append(landmark.y)
+                    flat_values.append(landmark.z)
+                # Flatten into a single list of 63 floats: x0,y0,z0,x1,y1,z1,...
+
+                packet = struct.pack(f"{NUM_FLOATS}f", *flat_values)
+                sock.sendto(packet, (UDP_IP, UDP_PORT))
+                # Pack as raw binary floats and send to Blender over UDP
 
             cv2.imshow("Hand Tracking", frame) # Display the frame in a seperate window
 
