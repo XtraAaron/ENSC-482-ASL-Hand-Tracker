@@ -70,9 +70,12 @@ def main():
     # Used to compute real millisecond timestamps for each frame
     # MediaPipe uses it for motion and continuity between frames
 
-    with HandLandmarker.create_from_options(options) as landmarker:
+    with HandLandmarker.create_from_options(options) as landmarker: # Builds the detector object using the defined options
         while True:
-            ret, frame = cap.read()
+            ret, frame = cap.read() # Grabs a frame from the camera
+            # Ret is sucess
+            # Frame is image data
+
             if not ret:
                 print("Failed to grab frame.")
                 break
