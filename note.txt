@@ -1,0 +1,11 @@
+For the curl, all numbers should be -, as + causes the fingerbones to bend backwards, towards backhand - fixed
+
++ spread causes the fingers to move closer together
+
+There will be clipping, as on the model all the digits/finger segments are ~ even, however on our actual fingers not true.
+Idrc so im leaving it, hard asf to find a good model and dont know how to model and cant be bothered to learn rn
+
+Thumb shit
+    X responsible for splay/spread
+    Y for the curl
+    

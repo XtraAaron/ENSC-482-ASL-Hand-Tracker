@@ -33,7 +33,7 @@ VisionRunningMode = mp.tasks.vision.RunningMode
 options = HandLandmarkerOptions(
     base_options=BaseOptions(model_asset_path=MODEL_PATH), # Options Object, passes it as one of the settings
     running_mode=VisionRunningMode.VIDEO, # Set to Video for video stream
-    num_hands=2 # Detect 2 hands
+    num_hands = 1 # Detect 1 hand
 )
 # Config object
 
