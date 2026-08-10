@@ -9,6 +9,7 @@ import cv2 # Open CV
 import mediapipe as mp
 from mediapipe.tasks import python # New version of mp.solutions
 from mediapipe.tasks.python import vision
+from OneEuroFilter import OneEuroFilter
 # Other import stuff
 
 MODEL_PATH = "hand_landmarker.task"
@@ -23,6 +24,14 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 NUM_FLOATS = 21 * 3
 # 21 landmarks per hand, each with x, y, z -> 63 floats
+
+# --- One Euro Filter setup ---
+# One filter per (landmark, axis) -> 21 landmarks x 3 axes (x,y,z)
+FILTER_CONFIG = {'freq': 30, 'mincutoff': 1.0, 'beta': 0.3, 'dcutoff': 1.0}
+filters = [[OneEuroFilter(**FILTER_CONFIG) for _ in range(3)] for _ in range(21)]
+# mincutoff -> lower = smoother when still, dcutoff -> filters the derivative estimate
+# beta -> higher = less lag on fast motion
+# Tune these while watching the Blender viewport if jitter/lag isn't right
 
 BaseOptions = mp.tasks.BaseOptions
 HandLandmarker = mp.tasks.vision.HandLandmarker
@@ -112,12 +121,18 @@ def main():
                 first_hand = result.hand_landmarks[0]
                 # Take just the first detected hand for this first test
 
+                frame_t = frame_timestamp_ms / 1000.0
+                # One Euro Filter wants seconds, not ms
+
                 flat_values = []
-                for landmark in first_hand:
-                    flat_values.append(landmark.x)
-                    flat_values.append(landmark.y)
-                    flat_values.append(landmark.z)
-                # Flatten into a single list of 63 floats: x0,y0,z0,x1,y1,z1,...
+                for i, landmark in enumerate(first_hand):
+                    fx = filters[i][0](landmark.x, frame_t)
+                    fy = filters[i][1](landmark.y, frame_t)
+                    fz = filters[i][2](landmark.z, frame_t)
+                    flat_values.append(fx)
+                    flat_values.append(fy)
+                    flat_values.append(fz)
+                # Flatten filtered values into a single list of 63 floats: x0,y0,z0,x1,y1,z1,...
 
                 packet = struct.pack(f"{NUM_FLOATS}f", *flat_values)
                 sock.sendto(packet, (UDP_IP, UDP_PORT))

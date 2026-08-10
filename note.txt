@@ -9,3 +9,6 @@ Thumb shit
     X responsible for splay/spread
     Y for the curl
     
+Using the one euro filter, as it says and i quote "Noisy signals are a common problem when tracking human motion" as the filter was designed with this in mind
+https://pypi.org/project/OneEuroFilter/
+Need to run pip install OneEuroFilter
