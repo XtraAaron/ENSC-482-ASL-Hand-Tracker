@@ -20,3 +20,4 @@ Current bugs: Minor
     Major:
     1. Thums isnt fully accurate
     2. When the hand faces sideways, this causes it to bend down.
+    3. The finger tips have a bit of trouble moving all the way
