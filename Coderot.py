@@ -88,7 +88,8 @@ PINKY3_CURL_AMPLITUDE = .8
 
 PALM_BONE_NAME = "Palm" # Bone name palm
 
-EULER_ORDER = 'XYZ'
+EULER_ORDER = 'XYZ' # Defined how blender should accept the Euler Rotation
+
 # computed[0] = rotation about the across-palm axis  -> true pitch  -> bone Z
 # computed[1] = rotation about the long (wrist->finger) axis -> roll -> bone Y
 # computed[2] = rotation about the palm-normal axis -> yaw/wave -> unused (0 sign)
