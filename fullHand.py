@@ -211,15 +211,16 @@ def hand_basis_matrix(landmarks): # Takes in the 21 landmark triplets
 # So we can still move fingers even when wrist rotates
 
 
-def ensure_target(armature):
+def ensure_target(armature): 
     target = bpy.data.objects.get(TARGET_NAME)
     if target is None:
         target = bpy.data.objects.new(TARGET_NAME, None)
         target.empty_display_size = 0.05
         target.empty_display_type = 'SPHERE'
         bpy.context.collection.objects.link(target)
-        print(f"Created target empty '{TARGET_NAME}'")
+        #print(f"Created target empty '{TARGET_NAME}'") # Debugging
     return target
+# This ensures that there is an invisible point, or Blender Empty exists, and if not creates one
 
 
 def ensure_constraint(armature):

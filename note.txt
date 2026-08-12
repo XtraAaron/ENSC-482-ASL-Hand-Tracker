@@ -25,3 +25,9 @@ Current bugs: Minor
     4. Model has a lot of trouble when things overlap, not sure what i can do abt that tho, cuz the model itself is a lot of liabilities
     5. Thumb is too high up and too long, and finger segments too long 
         IDGAF i dont know how to model in blender and i dont care enough to do so, it works enough
+
+
+        TODO: Fix the thumb, rn doesnt move enough.
+
+        Z and X only, dont touch Y
+        Possible to get it working, just need to script to detect and run it properly
