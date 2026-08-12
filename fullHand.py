@@ -90,15 +90,19 @@ PALM_BONE_NAME = "Palm" # Bone name palm
 
 EULER_ORDER = 'XYZ' # Defined how blender should accept the Euler Rotation
 
-# computed[0] = rotation about the across-palm axis  -> true pitch  -> bone Z
-# computed[1] = rotation about the long (wrist->finger) axis -> roll -> bone Y
-# computed[2] = rotation about the palm-normal axis -> yaw/wave -> unused (0 sign)
-PALM_AXIS_MAP = [2, 1, 0]     # which bone axis each computed euler component drives
-PALM_AXIS_SIGN = [-1, 1, 0]   # yaw disabled; flip to -1 per axis if a direction is backwards
+# Compuete = [pitch, roll, yaw]
+# Pitch is rotation about the across-palm axis, or 
+# Like the pitch of the plane, or a shoo motion
 
-# Press 'C' while the operator is running to re-capture the wrist rest pose
-# (hold your hand in a neutral, flat-facing-camera position when you do).
+# Roll is rotation about the long (wrist->finger) axis
+# Its like the roll of a plane
 
+# Yaw is rotation about the palm-normal axis which isnt used so we dont care
+# Its like waving your hand to say bye, or the yaw motion
+
+# Literally if you have ur fingers pointed forwards, its the same sorta deal as a plane 
+PALM_AXIS_MAP = [2, 1, 0] # Defines the bone components each euler drives, so pitch goes to z, roll to y, and yaw to x
+PALM_AXIS_SIGN = [-1, 1, 0] # Defines the direction of the axis
 
 def vector(p_from, p_to):
     return (p_to[0] - p_from[0], p_to[1] - p_from[1], p_to[2] - p_from[2])
@@ -182,21 +186,29 @@ def clamp(value, min_val, max_val):
 # Restricts value to stay within max and min, used to force stuff to remain within bounds
 
 
-def hand_basis_matrix(landmarks):
-    """Build an orthonormal rotation matrix from wrist/MCP landmarks (for wrist orientation)."""
-    wrist = mathutils.Vector(landmarks[0])
+def hand_basis_matrix(landmarks): # Takes in the 21 landmark triplets
+    wrist = mathutils.Vector(landmarks[0]) 
     index_mcp = mathutils.Vector(landmarks[5])
     middle_mcp = mathutils.Vector(landmarks[9])
     pinky_mcp = mathutils.Vector(landmarks[17])
+    # Converts the first index into a math utils vector, since norm and transposed only works on that
 
-    y_axis = (middle_mcp - wrist).normalized()          # long axis, wrist -> fingers
+    y_axis = (middle_mcp - wrist).normalized() # Creates the hands y-axis (roll axis)
+    # Does this by normalizing the vector between MCP3 and the wrist, as its the closest thing to a center line along the hand
+    
     v1 = (index_mcp - wrist)
     v2 = (pinky_mcp - wrist)
-    z_axis = v1.cross(v2).normalized()                   # palm normal
-    x_axis = y_axis.cross(z_axis).normalized()            # across the palm
-    z_axis = x_axis.cross(y_axis).normalized()            # re-orthogonalize
+    # Draw 2 more vectors from wrist to index and pinky base
 
-    return mathutils.Matrix((x_axis, y_axis, z_axis)).transposed()
+    z_axis = v1.cross(v2).normalized() # The cross of the 2 givea  new vec perpendicularly 2 both
+    # Makes a vector normal the palm (around)
+    x_axis = y_axis.cross(z_axis).normalized() # This produces the pitch axis, or the axis that goes from index to pinky
+    z_axis = x_axis.cross(y_axis).normalized() # This recalcs z using new y and x
+
+    return mathutils.Matrix((x_axis, y_axis, z_axis)).transposed() # Puts result in a 3x3 vector
+    # Transpose is needed as blender expecte axis vectors as columns
+# This functions is the function that makes the coordinate system relative to the hand (or the wrist)
+# So we can still move fingers even when wrist rotates
 
 
 def ensure_target(armature):
