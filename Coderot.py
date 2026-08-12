@@ -14,20 +14,16 @@ NUM_FLOATS = 21 * 3
 ARMATURE_NAME = "Armature"
 # Under the downloaded rig, the name of the of the bone thing
 
-# --- Thumb1 target/constraint setup ---
-BONE_NAME = "Thumb1"
-TARGET_NAME = "Thumb1_Target"  # empty created automatically, don't make this by hand
+BONE_NAME = "Thumb1" # The thumb1 bone
+TARGET_NAME = "Thumb1_Target" # Empty Object
 
-# If the thumb points the wrong way / mirrored, flip these signs first before anything else
 MAP_X = -1.0
 MAP_Y = 1.0
 MAP_Z = -1.0
+# This part was made so (-) can be changed to adjust and correct direction easily
 
-TARGET_DISTANCE = 0.3  # how far in front of the bone the empty sits; tune if tracking looks "weak"
-
-# --- Thumb2 (unchanged from the version that worked) ---
-THUMB2_CURL_AXIS = 2
-THUMB2_CURL_AMPLITUDE = 1.6
+TARGET_DISTANCE = 0.3  
+# Defines the distance at which a calculated point sits from the thumb1 bone
 
 # Bone Calibriation stuff
 # Axis describes which local rotational axis the bone will use.
@@ -41,6 +37,11 @@ CURL_AXIS = 2
 SPREAD_AXIS = 0
 
 # Note: Index1, 2... Indicate the bone in blender. 1 being the base, and 3 being the tip
+
+# Thumb2
+THUMB2_CURL_AXIS = 2
+THUMB2_CURL_AMPLITUDE = 1.6
+
 # Index1
 INDEX1_CURL_AMPLITUDE = 1.6
 INDEX1_SPREAD_AMPLITUDE = .5
@@ -85,8 +86,7 @@ PINKY2_CURL_AMPLITUDE = 1.6
 # Pinky
 PINKY3_CURL_AMPLITUDE = .8
 
-# --- Wrist/Palm orientation (pitch + roll from a real 3D basis, not 1D heuristics) ---
-PALM_BONE_NAME = "Palm"
+PALM_BONE_NAME = "Palm" # Bone name palm
 
 EULER_ORDER = 'XYZ'
 # computed[0] = rotation about the across-palm axis  -> true pitch  -> bone Z
