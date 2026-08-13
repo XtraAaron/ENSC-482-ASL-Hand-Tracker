@@ -14,17 +14,6 @@ NUM_FLOATS = 21 * 3
 ARMATURE_NAME = "Armature"
 # Under the downloaded rig, the name of the of the bone thing
 
-BONE_NAME = "Thumb1" # The thumb1 bone
-TARGET_NAME = "Thumb1_Target" # Empty Object
-
-MAP_X = -1.0
-MAP_Y = 1.0
-MAP_Z = -1.0
-# This part was made so (-) can be changed to adjust and correct direction easily
-
-TARGET_DISTANCE = 0.3  
-# Defines the distance at which a calculated point sits from the thumb1 bone
-
 # Bone Calibriation stuff
 # Axis describes which local rotational axis the bone will use.
 # Decided to use 2 types for the fingers, 0 being x, y being 1, and z being 2
@@ -51,7 +40,7 @@ INDEX1_CURL_SCALE = 1 # Unused, but dont want to remove cuz it works with it
 INDEX2_CURL_AMPLITUDE = 1.6
 
 # Index3
-INDEX3_CURL_AMPLITUDE = .8
+INDEX3_CURL_AMPLITUDE = 1.6
 
 # Middle1
 MIDDLE1_CURL_AMPLITUDE = 1.6
@@ -62,7 +51,7 @@ MIDDLE1_CURL_SCALE = 1
 MIDDLE2_CURL_AMPLITUDE = 1.6
 
 # Middle3
-MIDDLE3_CURL_AMPLITUDE = .8
+MIDDLE3_CURL_AMPLITUDE = 1.6
 
 # Ring1
 RING1_CURL_AMPLITUDE = 1.6
@@ -73,7 +62,7 @@ RING1_CURL_SCALE = 1
 RING2_CURL_AMPLITUDE = 1.6
 
 # Ring3
-RING3_CURL_AMPLITUDE = .8
+RING3_CURL_AMPLITUDE = 1.6
 
 # Pinky1
 PINKY1_CURL_AMPLITUDE = 1.6
@@ -84,7 +73,7 @@ PINKY1_CURL_SCALE = 1
 PINKY2_CURL_AMPLITUDE = 1.6
 
 # Pinky
-PINKY3_CURL_AMPLITUDE = .8
+PINKY3_CURL_AMPLITUDE = 1.6
 
 PALM_BONE_NAME = "Palm" # Bone name palm
 
@@ -211,33 +200,6 @@ def hand_basis_matrix(landmarks): # Takes in the 21 landmark triplets
 # So we can still move fingers even when wrist rotates
 
 
-def ensure_target(armature): 
-    target = bpy.data.objects.get(TARGET_NAME)
-    if target is None:
-        target = bpy.data.objects.new(TARGET_NAME, None)
-        target.empty_display_size = 0.05
-        target.empty_display_type = 'SPHERE'
-        bpy.context.collection.objects.link(target)
-        #print(f"Created target empty '{TARGET_NAME}'") # Debugging
-    return target
-# This ensures that there is an invisible point, or Blender Empty exists, and if not creates one
-
-
-def ensure_constraint(armature):
-    bone = armature.pose.bones.get(BONE_NAME)
-    if bone is None:
-        print(f"Bone '{BONE_NAME}' not found")
-        return
-
-    con = bone.constraints.get("ThumbDampedTrack")
-    if con is None:
-        con = bone.constraints.new('DAMPED_TRACK')
-        con.name = "ThumbDampedTrack"
-        con.target = bpy.data.objects.get(TARGET_NAME)
-        con.track_axis = 'TRACK_Y'  # bones point along local Y
-        print("Added Damped Track constraint to Thumb1")
-
-
 def swing_twist(quat, twist_axis):
     # Splits quat into a pure rotation about twist_axis (twist)
     # and everything else (swing), with no leakage between them.
@@ -277,28 +239,6 @@ class LandmarkReceiver(bpy.types.Operator):
             return {'CANCELLED'}
 
         return {'PASS_THROUGH'}
-
-    def update_thumb1_target(self, armature, landmarks):
-        bone = armature.pose.bones.get(BONE_NAME)
-        target = bpy.data.objects.get(TARGET_NAME)
-        if bone is None or target is None:
-            return
-
-        raw_dir = vector(landmarks[2], landmarks[3])
-        dx, dy, dz = normalize(raw_dir)
-        print(f"THUMB dx={dx:.4f} dy={dy:.4f} dz={dz:.4f}")
-        dx, dy, dz = dz, dx, dy
-        # 2
-        dx, dy, dz = dx * MAP_X, dy * MAP_Y, dz * MAP_Z
-
-        bone_head_world = armature.matrix_world @ bone.head
-
-        target.location = (
-            bone_head_world.x + dx * TARGET_DISTANCE,
-            bone_head_world.y + dy * TARGET_DISTANCE,
-            bone_head_world.z + dz * TARGET_DISTANCE,
-        )
-
 
     def update_wrist_rotation(self, armature, landmarks):
         bone = armature.pose.bones.get(PALM_BONE_NAME)
@@ -383,8 +323,7 @@ class LandmarkReceiver(bpy.types.Operator):
         # --- Wrist/Palm ---
         self.update_wrist_rotation(armature, landmarks)
 
-        # --- Thumb ---
-        self.update_thumb1_target(armature, landmarks)
+        # --- Thumb --- (Thumb1/CMC removed for now, ICP1->MCP1 not working)
         self.apply_curl_joint(armature, "Thumb2", landmarks, 1, 2, 4, THUMB2_CURL_AMPLITUDE,
                                curl_axis=THUMB2_CURL_AXIS)
 
@@ -425,9 +364,6 @@ class LandmarkReceiver(bpy.types.Operator):
         if armature is None:
             print(f"Armature '{ARMATURE_NAME}' not found")
             return {'CANCELLED'}
-
-        ensure_target(armature)
-        ensure_constraint(armature)
 
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._sock.bind((UDP_IP, UDP_PORT))

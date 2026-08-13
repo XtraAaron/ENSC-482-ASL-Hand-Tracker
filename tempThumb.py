@@ -14,17 +14,6 @@ NUM_FLOATS = 21 * 3
 ARMATURE_NAME = "Armature"
 # Under the downloaded rig, the name of the of the bone thing
 
-BONE_NAME = "Thumb1" # The thumb1 bone
-TARGET_NAME = "Thumb1_Target" # Empty Object
-
-MAP_X = -1.0
-MAP_Y = 1.0
-MAP_Z = -1.0
-# This part was made so (-) can be changed to adjust and correct direction easily
-
-TARGET_DISTANCE = 0.3  
-# Defines the distance at which a calculated point sits from the thumb1 bone
-
 # Bone Calibriation stuff
 # Axis describes which local rotational axis the bone will use.
 # Decided to use 2 types for the fingers, 0 being x, y being 1, and z being 2
@@ -51,7 +40,7 @@ INDEX1_CURL_SCALE = 1 # Unused, but dont want to remove cuz it works with it
 INDEX2_CURL_AMPLITUDE = 1.6
 
 # Index3
-INDEX3_CURL_AMPLITUDE = .8
+INDEX3_CURL_AMPLITUDE = 1.6
 
 # Middle1
 MIDDLE1_CURL_AMPLITUDE = 1.6
@@ -62,7 +51,7 @@ MIDDLE1_CURL_SCALE = 1
 MIDDLE2_CURL_AMPLITUDE = 1.6
 
 # Middle3
-MIDDLE3_CURL_AMPLITUDE = .8
+MIDDLE3_CURL_AMPLITUDE = 1.6
 
 # Ring1
 RING1_CURL_AMPLITUDE = 1.6
@@ -73,7 +62,7 @@ RING1_CURL_SCALE = 1
 RING2_CURL_AMPLITUDE = 1.6
 
 # Ring3
-RING3_CURL_AMPLITUDE = .8
+RING3_CURL_AMPLITUDE = 1.6
 
 # Pinky1
 PINKY1_CURL_AMPLITUDE = 1.6
@@ -84,7 +73,7 @@ PINKY1_CURL_SCALE = 1
 PINKY2_CURL_AMPLITUDE = 1.6
 
 # Pinky
-PINKY3_CURL_AMPLITUDE = .8
+PINKY3_CURL_AMPLITUDE = 1.6
 
 PALM_BONE_NAME = "Palm" # Bone name palm
 
@@ -251,34 +240,6 @@ class LandmarkReceiver(bpy.types.Operator):
 
         return {'PASS_THROUGH'}
 
-    def update_thumb1_rotation(self, armature, landmarks):
-        bone = armature.pose.bones.get(BONE_NAME)
-        if bone is None:
-            return
-
-        # forward = thumb1->thumb2 direction (bone's Y)
-        forward = mathutils.Vector(normalize(vector(landmarks[2], landmarks[3])))
-
-        # up reference: palm normal, so roll is pinned to the hand, not arbitrary
-        palm_normal = mathutils.Vector(normalize(cross(
-            vector(landmarks[0], landmarks[5]),
-            vector(landmarks[0], landmarks[17]),
-        )))
-
-        x_axis = forward.cross(palm_normal).normalized()
-        z_axis = x_axis.cross(forward).normalized()
-        # y_axis = forward
-
-        target_matrix = mathutils.Matrix((x_axis, forward, z_axis)).transposed()
-
-        # convert world-ish basis into Thumb1's local pose space
-        parent_matrix = bone.parent.matrix if bone.parent else mathutils.Matrix.Identity(3)
-        local_matrix = (armature.matrix_world.to_3x3() @ parent_matrix).inverted() @ target_matrix
-
-        bone.rotation_mode = 'QUATERNION'
-        bone.rotation_quaternion = local_matrix.to_quaternion()
-
-
     def update_wrist_rotation(self, armature, landmarks):
         bone = armature.pose.bones.get(PALM_BONE_NAME)
         if bone is None:
@@ -362,8 +323,7 @@ class LandmarkReceiver(bpy.types.Operator):
         # --- Wrist/Palm ---
         self.update_wrist_rotation(armature, landmarks)
 
-        # --- Thumb ---
-        self.update_thumb1_target(armature, landmarks)
+        # --- Thumb --- (Thumb1/CMC removed for now, ICP1->MCP1 not working)
         self.apply_curl_joint(armature, "Thumb2", landmarks, 1, 2, 4, THUMB2_CURL_AMPLITUDE,
                                curl_axis=THUMB2_CURL_AXIS)
 
