@@ -288,6 +288,30 @@ class LandmarkReceiver(bpy.types.Operator):
         rotation[SPREAD_AXIS] = spread
         bone.rotation_euler = tuple(rotation)
 
+
+    def apply_thumb1_joint(self, armature, landmarks):
+        bone = armature.pose.bones.get("Thumb1")
+        if bone is None:
+            print("Bone 'Thumb1' not found")
+            return
+
+        basis = hand_basis_matrix(landmarks)
+        across_axis = basis.col[0]   # index-to-pinky direction
+        normal_axis = basis.col[2]   # palm normal
+
+        thumb1_vec = vector(landmarks[2], landmarks[3])  # MCP1 -> IP1
+
+        angle_x = angle_between(thumb1_vec, across_axis)
+        angle_z = angle_between(thumb1_vec, normal_axis)
+
+        bone.rotation_mode = 'XYZ'
+        rotation = [0.0, 0.0, 0.0]
+        rotation[0] = angle_x - 90
+        rotation[1] = 0.0
+        rotation[2] = angle_z - 90
+        bone.rotation_euler = tuple(rotation)
+
+
     def apply_curl_joint(self, armature, bone_name, landmarks, idx_a, idx_b, idx_c, curl_amplitude,
                           curl_axis=CURL_AXIS):
         bone = armature.pose.bones.get(bone_name)
@@ -323,7 +347,8 @@ class LandmarkReceiver(bpy.types.Operator):
         # --- Wrist/Palm ---
         self.update_wrist_rotation(armature, landmarks)
 
-        # --- Thumb --- (Thumb1/CMC removed for now, ICP1->MCP1 not working)
+        # --- Thumb ---
+        self.apply_thumb1_joint(armature, landmarks)
         self.apply_curl_joint(armature, "Thumb2", landmarks, 1, 2, 4, THUMB2_CURL_AMPLITUDE,
                                curl_axis=THUMB2_CURL_AXIS)
 

@@ -133,14 +133,14 @@ def main():
                     flat_values.append(fy)
                     flat_values.append(fz)
                 
-                # frame_count += 1
-                # if frame_count % 30 == 0:
-                #     mcp1 = flat_values[2*3 : 2*3+3]
-                #     ip1  = flat_values[3*3 : 3*3+3]
-                #     print(f"Frame {frame_timestamp_ms}ms")
-                #     print(f"  MCP1: {[round(v, 4) for v in mcp1]}")
-                #     print(f"  IP1:  {[round(v, 4) for v in ip1]}")
-                #     print()
+                frame_count += 1
+                if frame_count % 30 == 0:
+                    cmc1 = flat_values[1*3 : 1*3+3]
+                    mcp2 = flat_values[2*3 : 2*3+3]
+                    print(f"Frame {frame_timestamp_ms}ms")
+                    print(f"  CMC1: {[round(v, 4) for v in cmc1]}")
+                    print(f"  MCP2: {[round(v, 4) for v in mcp2]}")
+                    print()
                 # Debug stuff
 
                 packet = struct.pack(f"{NUM_FLOATS}f", *flat_values)
