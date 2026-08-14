@@ -306,9 +306,23 @@ class LandmarkReceiver(bpy.types.Operator):
 
         bone.rotation_mode = 'XYZ'
         rotation = [0.0, 0.0, 0.0]
-        rotation[0] = angle_x - 90
+        rotation[0] = angle_x - 1.6
         rotation[1] = 0.0
-        rotation[2] = angle_z - 90
+        rotation[2] = angle_z - 1.6
+        bone.rotation_euler = tuple(rotation)
+        
+        
+    def apply_thumb2_joint(self, armature, landmarks):
+        bone = armature.pose.bones.get("Thumb2")
+        if bone is None:
+            print("Bone 'Thumb2' not found")
+            return
+
+        bend = joint_bend(landmarks, 1, 2, 4)
+        curl = ((math.pi / 2) - clamp(-bend, -THUMB2_CURL_AMPLITUDE, 0.0) - 1.6) * 1.2
+
+        bone.rotation_mode = 'XYZ'
+        rotation = [curl, 0.0, 0.0]
         bone.rotation_euler = tuple(rotation)
 
 
@@ -349,8 +363,7 @@ class LandmarkReceiver(bpy.types.Operator):
 
         # --- Thumb ---
         self.apply_thumb1_joint(armature, landmarks)
-        self.apply_curl_joint(armature, "Thumb2", landmarks, 1, 2, 4, THUMB2_CURL_AMPLITUDE,
-                               curl_axis=THUMB2_CURL_AXIS)
+        self.apply_thumb2_joint(armature, landmarks)
 
         # --- Fingers ---
         forward = normalize(vector(landmarks[0], landmarks[9]))
