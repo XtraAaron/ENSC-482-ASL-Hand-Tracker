@@ -306,9 +306,9 @@ class LandmarkReceiver(bpy.types.Operator):
 
         bone.rotation_mode = 'XYZ'
         rotation = [0.0, 0.0, 0.0]
-        rotation[0] = angle_x - 1.6
+        rotation[0] = (angle_x - 1.6) * 1
         rotation[1] = 0.0
-        rotation[2] = angle_z - 1.6
+        rotation[2] = (angle_z - 1.6) * 1
         bone.rotation_euler = tuple(rotation)
         
         

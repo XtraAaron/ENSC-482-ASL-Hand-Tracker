@@ -1,3 +1,34 @@
+Asl review
+A Good
+B, pinky spread needs to be more pronounced, but its good enough tbh
+C is kinda jank, but thats cuz of how i implimented thumb2. Possible to change, but not fun. Distinct Enough
+D is same, part of the issue itself is the finger lengths themselves
+E kinda works? Doesnt work as well cuz of the model tho, the actions are correct tho. Distinct Enough
+F Looks weird due to lengths, but i think distinct Enough
+G - Needs work, pitch breaks - Fix
+H Good
+I Good
+J Cant do need wrist sway - Fix
+K sorta, bit weird. Distinct Enough
+L Good
+M suffers from a bit of mediapipe tracking, and the thumb position on the model. Ehhh maybe not sure
+N Good, just fix weird finger snap
+O, mostly fine, just thumb rotation. Distinct Enough
+P Good
+Q Theres something about this motion that forces the wrist to not pitch down- Fix
+R Good enough
+S Good enough
+T Mostly good, rotating wrist causes bug tho where it snaps into place, the fingers. Just fix that
+U Good
+V Good
+W Good
+X Could be better, still distint enough i think. Distinct Enough
+Y Good
+Z Could be better, still distint enough i think. Distinct Enough
+
+Fix finger bug
+
+
 For the curl, all numbers should be -, as + causes the fingerbones to bend backwards, towards backhand - fixed
 
 + spread causes the fingers to move closer together
