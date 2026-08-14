@@ -5,7 +5,7 @@ C is kinda jank, but thats cuz of how i implimented thumb2. Possible to change, 
 D is same, part of the issue itself is the finger lengths themselves
 E kinda works? Doesnt work as well cuz of the model tho, the actions are correct tho. Distinct Enough
 F Looks weird due to lengths, but i think distinct Enough
-G - Needs work, pitch breaks - Fix
+G - Works fairly solid? Only issue with the sway of the hand not existing, other than that, Distinct Enough
 H Good
 I Good
 J Cant do need wrist sway - Fix
@@ -26,7 +26,8 @@ X Could be better, still distint enough i think. Distinct Enough
 Y Good
 Z Could be better, still distint enough i think. Distinct Enough
 
-Fix finger bug
+Fix finger bug - Need to do eventually
+Fix Q, issue may be with motion of the hand tho.
 
 
 For the curl, all numbers should be -, as + causes the fingerbones to bend backwards, towards backhand - fixed
