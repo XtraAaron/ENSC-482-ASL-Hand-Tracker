@@ -27,10 +27,6 @@ SPREAD_AXIS = 0
 
 # Note: Index1, 2... Indicate the bone in blender. 1 being the base, and 3 being the tip
 
-# Thumb1 (CMC1 -> MCP1, i.e. landmarks 1 -> 2)
-THUMB1_CURL_AXIS = 2
-THUMB1_CURL_AMPLITUDE = 1.6
-
 # Thumb2
 THUMB2_CURL_AXIS = 2
 THUMB2_CURL_AMPLITUDE = 1.6
@@ -44,7 +40,7 @@ INDEX1_CURL_SCALE = 1 # Unused, but dont want to remove cuz it works with it
 INDEX2_CURL_AMPLITUDE = 1.6
 
 # Index3
-INDEX3_CURL_AMPLITUDE = .8
+INDEX3_CURL_AMPLITUDE = 1.6
 
 # Middle1
 MIDDLE1_CURL_AMPLITUDE = 1.6
@@ -55,7 +51,7 @@ MIDDLE1_CURL_SCALE = 1
 MIDDLE2_CURL_AMPLITUDE = 1.6
 
 # Middle3
-MIDDLE3_CURL_AMPLITUDE = .8
+MIDDLE3_CURL_AMPLITUDE = 1.6
 
 # Ring1
 RING1_CURL_AMPLITUDE = 1.6
@@ -66,7 +62,7 @@ RING1_CURL_SCALE = 1
 RING2_CURL_AMPLITUDE = 1.6
 
 # Ring3
-RING3_CURL_AMPLITUDE = .8
+RING3_CURL_AMPLITUDE = 1.6
 
 # Pinky1
 PINKY1_CURL_AMPLITUDE = 1.6
@@ -77,7 +73,7 @@ PINKY1_CURL_SCALE = 1
 PINKY2_CURL_AMPLITUDE = 1.6
 
 # Pinky
-PINKY3_CURL_AMPLITUDE = .8
+PINKY3_CURL_AMPLITUDE = 1.6
 
 PALM_BONE_NAME = "Palm" # Bone name palm
 
@@ -327,26 +323,17 @@ class LandmarkReceiver(bpy.types.Operator):
         # --- Wrist/Palm ---
         self.update_wrist_rotation(armature, landmarks)
 
-        # --- Hand basis (needed by thumb + fingers) ---
+        # --- Thumb --- (Thumb1/CMC removed for now, ICP1->MCP1 not working)
+        self.apply_curl_joint(armature, "Thumb2", landmarks, 1, 2, 4, THUMB2_CURL_AMPLITUDE,
+                               curl_axis=THUMB2_CURL_AXIS)
+
+        # --- Fingers ---
         forward = normalize(vector(landmarks[0], landmarks[9]))
         palm_normal = normalize(cross(
             vector(landmarks[0], landmarks[5]),
             vector(landmarks[0], landmarks[17]),
         ))
         side = normalize(cross(palm_normal, forward))
-
-        # --- Thumb ---
-        # Thumb1 = CMC1 -> MCP1 (landmarks 1 -> 2).
-        # NOTE: this is a full bend (wrist->CMC->MCP), not curl-only like the fingers --
-        # the old curl-only version stripped out the side component, which is the
-        # component that actually encodes thumb opposition/tuck. So use the plain
-        # joint_bend angle instead, same pattern as Thumb2.
-        _dbg_bend = joint_bend(landmarks, 0, 1, 2)
-        print(f"THUMB1 bend={_dbg_bend:.3f}")
-        self.apply_curl_joint(armature, "Thumb1", landmarks, 0, 1, 2, THUMB1_CURL_AMPLITUDE,
-                               curl_axis=THUMB1_CURL_AXIS)
-        self.apply_curl_joint(armature, "Thumb2", landmarks, 1, 2, 4, THUMB2_CURL_AMPLITUDE,
-                               curl_axis=THUMB2_CURL_AXIS)
 
         # --- Index ---
         self.apply_base_joint(armature, "Index1", landmarks, (0, 5, 6), forward, side,
@@ -407,4 +394,4 @@ def unregister():
 
 if __name__ == "__main__":
     register()
-    bpy.ops.wm.landmark_receiver() ###
+    bpy.ops.wm.landmark_receiver()

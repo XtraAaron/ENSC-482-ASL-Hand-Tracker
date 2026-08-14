@@ -3,6 +3,7 @@ import socket
 import struct
 import math
 import time
+import mathutils
 # The import stuff
 
 # UDP stuff, we using udp rn to send data between the py code and the blender stuff
@@ -14,19 +15,24 @@ ARMATURE_NAME = "Armature"
 # Under the downloaded rig, the name of the of the bone thing
 
 # Bone Calibriation stuff
-# Axis describes which local rotational axis the bone will use. 
+# Axis describes which local rotational axis the bone will use.
 # Decided to use 2 types for the fingers, 0 being x, y being 1, and z being 2
 # Blender is weird, so i only got it to work with the curl being the z and the spread being the x
 # Amplitude is used to clamp the rotation and force it within the desired range
 # From my own observation of my fingers, it appears to be from 0 to pi/2 or 0 to ~1.6
 # Spread appeared to be ~30 degrees, so set it to .5 (all units taken are in rads)
 # Only the base (x1) has spread, as it has 2 Degrees of Freedom. Other joints are single degree
-CURL_AXIS = 2 
+CURL_AXIS = 2
 SPREAD_AXIS = 0
 
 # Note: Index1, 2... Indicate the bone in blender. 1 being the base, and 3 being the tip
+
+# Thumb2
+THUMB2_CURL_AXIS = 2
+THUMB2_CURL_AMPLITUDE = 1.6
+
 # Index1
-INDEX1_CURL_AMPLITUDE = 1.6 
+INDEX1_CURL_AMPLITUDE = 1.6
 INDEX1_SPREAD_AMPLITUDE = .5
 INDEX1_CURL_SCALE = 1 # Unused, but dont want to remove cuz it works with it
 
@@ -34,7 +40,7 @@ INDEX1_CURL_SCALE = 1 # Unused, but dont want to remove cuz it works with it
 INDEX2_CURL_AMPLITUDE = 1.6
 
 # Index3
-INDEX3_CURL_AMPLITUDE = .8
+INDEX3_CURL_AMPLITUDE = 1.6
 
 # Middle1
 MIDDLE1_CURL_AMPLITUDE = 1.6
@@ -45,7 +51,7 @@ MIDDLE1_CURL_SCALE = 1
 MIDDLE2_CURL_AMPLITUDE = 1.6
 
 # Middle3
-MIDDLE3_CURL_AMPLITUDE = .8
+MIDDLE3_CURL_AMPLITUDE = 1.6
 
 # Ring1
 RING1_CURL_AMPLITUDE = 1.6
@@ -56,7 +62,7 @@ RING1_CURL_SCALE = 1
 RING2_CURL_AMPLITUDE = 1.6
 
 # Ring3
-RING3_CURL_AMPLITUDE = .8
+RING3_CURL_AMPLITUDE = 1.6
 
 # Pinky1
 PINKY1_CURL_AMPLITUDE = 1.6
@@ -67,8 +73,25 @@ PINKY1_CURL_SCALE = 1
 PINKY2_CURL_AMPLITUDE = 1.6
 
 # Pinky
-PINKY3_CURL_AMPLITUDE = .8
+PINKY3_CURL_AMPLITUDE = 1.6
 
+PALM_BONE_NAME = "Palm" # Bone name palm
+
+EULER_ORDER = 'XYZ' # Defined how blender should accept the Euler Rotation
+
+# Compuete = [pitch, roll, yaw]
+# Pitch is rotation about the across-palm axis, or 
+# Like the pitch of the plane, or a shoo motion
+
+# Roll is rotation about the long (wrist->finger) axis
+# Its like the roll of a plane
+
+# Yaw is rotation about the palm-normal axis which isnt used so we dont care
+# Its like waving your hand to say bye, or the yaw motion
+
+# Literally if you have ur fingers pointed forwards, its the same sorta deal as a plane 
+PALM_AXIS_MAP = [2, 1, 0] # Defines the bone components each euler drives, so pitch goes to z, roll to y, and yaw to x
+PALM_AXIS_SIGN = [-1, 1, 0] # Defines the direction of the axis
 
 def vector(p_from, p_to):
     return (p_to[0] - p_from[0], p_to[1] - p_from[1], p_to[2] - p_from[2])
@@ -106,7 +129,7 @@ def angle_between(v1, v2):
     # Length stuff
     if mag1 == 0 or mag2 == 0: # Handle 0 to avoid division by 0
         return 0.0
-    
+
     cos_angle = max(-1.0, min(1.0, d / (mag1 * mag2)))
     return math.acos(cos_angle)
 # Finds the angle between 2 vectors, using formula cos^{-1}((v1*v2)/(|v1||v2|))
@@ -129,7 +152,7 @@ def joint_bend_curl_only(landmarks, idx_a, idx_b, idx_c, side):
         v2[0] - side_component * side[0],
         v2[1] - side_component * side[1],
         v2[2] - side_component * side[2],
-    ) 
+    )
     # Removes the side component
     return angle_between(v1, v2_curl)
 # Similar to joint bend, but remove the side component first
@@ -139,7 +162,7 @@ def joint_bend_curl_only(landmarks, idx_a, idx_b, idx_c, side):
 
 # Forward and side represent the axis relative to the hand, note may note a unit vector since its relative
 # Forward is up (base to tip of finger), side is index to pinky
-def spread_angle(finger_vector, forward, side): 
+def spread_angle(finger_vector, forward, side):
     v_forward = dot(finger_vector, forward) # Forward component (up)
     v_side = dot(finger_vector, side) # Side component (index to pinky)
     return math.atan2(v_side, v_forward)
@@ -152,6 +175,46 @@ def clamp(value, min_val, max_val):
 # Restricts value to stay within max and min, used to force stuff to remain within bounds
 
 
+def hand_basis_matrix(landmarks): # Takes in the 21 landmark triplets
+    wrist = mathutils.Vector(landmarks[0]) 
+    index_mcp = mathutils.Vector(landmarks[5])
+    middle_mcp = mathutils.Vector(landmarks[9])
+    pinky_mcp = mathutils.Vector(landmarks[17])
+    # Converts the first index into a math utils vector, since norm and transposed only works on that
+
+    y_axis = (middle_mcp - wrist).normalized() # Creates the hands y-axis (roll axis)
+    # Does this by normalizing the vector between MCP3 and the wrist, as its the closest thing to a center line along the hand
+    
+    v1 = (index_mcp - wrist)
+    v2 = (pinky_mcp - wrist)
+    # Draw 2 more vectors from wrist to index and pinky base
+
+    z_axis = v1.cross(v2).normalized() # The cross of the 2 givea  new vec perpendicularly 2 both
+    # Makes a vector normal the palm (around)
+    x_axis = y_axis.cross(z_axis).normalized() # This produces the pitch axis, or the axis that goes from index to pinky
+    z_axis = x_axis.cross(y_axis).normalized() # This recalcs z using new y and x
+
+    return mathutils.Matrix((x_axis, y_axis, z_axis)).transposed() # Puts result in a 3x3 vector
+    # Transpose is needed as blender expecte axis vectors as columns
+# This functions is the function that makes the coordinate system relative to the hand (or the wrist)
+# So we can still move fingers even when wrist rotates
+
+
+def swing_twist(quat, twist_axis):
+    # Splits quat into a pure rotation about twist_axis (twist)
+    # and everything else (swing), with no leakage between them.
+    twist_axis = twist_axis.normalized()
+    qv = mathutils.Vector((quat.x, quat.y, quat.z))
+    proj = twist_axis * qv.dot(twist_axis)
+    twist = mathutils.Quaternion((quat.w, proj.x, proj.y, proj.z))
+    if twist.magnitude < 1e-9:
+        twist = mathutils.Quaternion((1, 0, 0, 0))
+    else:
+        twist.normalize()
+    swing = quat @ twist.inverted()
+    return swing, twist
+
+
 class LandmarkReceiver(bpy.types.Operator):
     # Like a class, specifically a child class taking stuff from parent class bpy.types.Operator
     bl_idname = "wm.landmark_receiver" # Blender operator name
@@ -160,17 +223,50 @@ class LandmarkReceiver(bpy.types.Operator):
     _timer = None
     _sock = None
     _start_time = None
+    _rest_matrix = None  # wrist calibration
     # Class var creation
 
     def modal(self, context, event):
         if event.type == 'TIMER':
             self.poll_socket(context)
 
+        if event.type == 'C' and event.value == 'PRESS':
+            self._rest_matrix = None
+            print("Wrist rest pose cleared -- will recalibrate on next frame.")
+
         if event.type == 'ESC':
             self.cancel(context)
             return {'CANCELLED'}
 
         return {'PASS_THROUGH'}
+
+    def update_wrist_rotation(self, armature, landmarks):
+        bone = armature.pose.bones.get(PALM_BONE_NAME)
+        if bone is None:
+            return
+
+        current_matrix = hand_basis_matrix(landmarks)
+
+        if self._rest_matrix is None:
+            self._rest_matrix = current_matrix
+            print("Calibrated wrist rest pose.")
+            return
+
+        relative = self._rest_matrix.inverted() @ current_matrix
+        relative_quat = relative.to_quaternion()
+
+        # Y = long axis (wrist -> fingers) = roll/twist axis
+        swing, twist = swing_twist(relative_quat, mathutils.Vector((0, 1, 0)))
+
+        roll = twist.angle if twist.axis.y >= 0 else -twist.angle
+        pitch = swing.to_euler(EULER_ORDER)[0]  # swing has no roll component left, so this is clean
+        computed = [pitch, roll, 0.0]
+
+        bone.rotation_mode = EULER_ORDER
+        rotation = [0.0, 0.0, 0.0]
+        for i in range(3):
+            rotation[PALM_AXIS_MAP[i]] = computed[i] * PALM_AXIS_SIGN[i]
+        bone.rotation_euler = tuple(rotation)
 
     def apply_base_joint(self, armature, bone_name, landmarks, points, forward, side,
                           curl_amplitude, curl_scale, spread_amplitude):
@@ -192,7 +288,8 @@ class LandmarkReceiver(bpy.types.Operator):
         rotation[SPREAD_AXIS] = spread
         bone.rotation_euler = tuple(rotation)
 
-    def apply_curl_joint(self, armature, bone_name, landmarks, idx_a, idx_b, idx_c, curl_amplitude):
+    def apply_curl_joint(self, armature, bone_name, landmarks, idx_a, idx_b, idx_c, curl_amplitude,
+                          curl_axis=CURL_AXIS):
         bone = armature.pose.bones.get(bone_name)
         if bone is None:
             print(f"Bone '{bone_name}' not found")
@@ -203,7 +300,7 @@ class LandmarkReceiver(bpy.types.Operator):
 
         bone.rotation_mode = 'XYZ'
         rotation = [0.0, 0.0, 0.0]
-        rotation[CURL_AXIS] = curl
+        rotation[curl_axis] = curl
         bone.rotation_euler = tuple(rotation)
 
     def poll_socket(self, context):
@@ -223,6 +320,14 @@ class LandmarkReceiver(bpy.types.Operator):
             print(f"Armature '{ARMATURE_NAME}' not found")
             return
 
+        # --- Wrist/Palm ---
+        self.update_wrist_rotation(armature, landmarks)
+
+        # --- Thumb --- (Thumb1/CMC removed for now, ICP1->MCP1 not working)
+        self.apply_curl_joint(armature, "Thumb2", landmarks, 1, 2, 4, THUMB2_CURL_AMPLITUDE,
+                               curl_axis=THUMB2_CURL_AXIS)
+
+        # --- Fingers ---
         forward = normalize(vector(landmarks[0], landmarks[9]))
         palm_normal = normalize(cross(
             vector(landmarks[0], landmarks[5]),
@@ -255,6 +360,11 @@ class LandmarkReceiver(bpy.types.Operator):
         self.apply_curl_joint(armature, "Pinky3", landmarks, 18, 19, 20, PINKY3_CURL_AMPLITUDE)
 
     def execute(self, context):
+        armature = bpy.data.objects.get(ARMATURE_NAME)
+        if armature is None:
+            print(f"Armature '{ARMATURE_NAME}' not found")
+            return {'CANCELLED'}
+
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._sock.bind((UDP_IP, UDP_PORT))
         self._sock.setblocking(False)

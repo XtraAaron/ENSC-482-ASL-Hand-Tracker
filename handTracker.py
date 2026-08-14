@@ -90,13 +90,13 @@ def main():
     start_time = time.time()
     # Used to compute real millisecond timestamps for each frame
     # MediaPipe uses it for motion and continuity between frames
-
+    frame_count = 0
     with HandLandmarker.create_from_options(options) as landmarker: # Builds the detector object using the defined options
         while True:
             ret, frame = cap.read() # Grabs a frame from the camera
             # Ret is sucess
             # Frame is image data
-
+            
             if not ret:
                 print("Failed to grab frame.")
                 break
@@ -132,8 +132,19 @@ def main():
                     flat_values.append(fx)
                     flat_values.append(fy)
                     flat_values.append(fz)
-                # Flatten filtered values into a single list of 63 floats: x0,y0,z0,x1,y1,z1,...
+                
+                # frame_count += 1
+                # if frame_count % 30 == 0:
+                #     mcp1 = flat_values[2*3 : 2*3+3]
+                #     ip1  = flat_values[3*3 : 3*3+3]
+                #     print(f"Frame {frame_timestamp_ms}ms")
+                #     print(f"  MCP1: {[round(v, 4) for v in mcp1]}")
+                #     print(f"  IP1:  {[round(v, 4) for v in ip1]}")
+                #     print()
+                # Debug stuff
 
+                packet = struct.pack(f"{NUM_FLOATS}f", *flat_values)
+                sock.sendto(packet, (UDP_IP, UDP_PORT))
                 packet = struct.pack(f"{NUM_FLOATS}f", *flat_values)
                 sock.sendto(packet, (UDP_IP, UDP_PORT))
                 # Pack as raw binary floats and send to Blender over UDP
