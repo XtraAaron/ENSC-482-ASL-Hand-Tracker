@@ -1,9 +1,9 @@
-import bpy
-import socket
-import struct
-import math
-import time
-import mathutils
+import bpy # Blender Python API
+import socket # Used to open UDP socket
+import struct # Packs/unpacks raw bytes do and from python values
+import math # Math stuff
+import time # Time stuff
+import mathutils # Vector math stuff
 # The import stuff
 
 # UDP stuff, we using udp rn to send data between the py code and the blender stuff
@@ -201,18 +201,21 @@ def hand_basis_matrix(landmarks): # Takes in the 21 landmark triplets
 
 
 def swing_twist(quat, twist_axis):
-    # Splits quat into a pure rotation about twist_axis (twist)
-    # and everything else (swing), with no leakage between them.
-    twist_axis = twist_axis.normalized()
-    qv = mathutils.Vector((quat.x, quat.y, quat.z))
-    proj = twist_axis * qv.dot(twist_axis)
-    twist = mathutils.Quaternion((quat.w, proj.x, proj.y, proj.z))
+    twist_axis = twist_axis.normalized() # Ensures the axis pases is in unit lenth to be compatible with the math
+    qv = mathutils.Vector((quat.x, quat.y, quat.z)) # Gets the imaginary part of the rotation
+    # So uh quaternions are complex and basically xyz are the imaginary parts and w is the real part
+    # Its a method of representing rotations in 3D space
+    proj = twist_axis * qv.dot(twist_axis) # Projects qv onto the twist axis
+    # This gives the component of the rotation actually about the axis
+    twist = mathutils.Quaternion((quat.w, proj.x, proj.y, proj.z)) # This makes a new quatnarion from the projected vector and og w
     if twist.magnitude < 1e-9:
-        twist = mathutils.Quaternion((1, 0, 0, 0))
+        twist = mathutils.Quaternion((1, 0, 0, 0)) # Twist becoimes the identity quaternion (no rotation)
+        # A check for when the projection is ~0, in this case almost pure pitch and no roll, avoids dividing by 0 when normalizing
     else:
-        twist.normalize()
-    swing = quat @ twist.inverted()
-    return swing, twist
+        twist.normalize() # Otherwise normalize as usual
+    swing = quat @ twist.inverted() # Remove twist from og rotation, leaving only swing
+    return swing, twist # Return
+# This function takes in a quaternion (W,X,Y,Z) rotation, and splits it into the pitch and the roll movement
 
 
 class LandmarkReceiver(bpy.types.Operator):
@@ -220,56 +223,68 @@ class LandmarkReceiver(bpy.types.Operator):
     bl_idname = "wm.landmark_receiver" # Blender operator name
     bl_label = "Landmark Receiver" # The label for our (human/usage in ui) reading
 
-    _timer = None
-    _sock = None
-    _start_time = None
-    _rest_matrix = None  # wrist calibration
+    _timer = None # Stores the reference to the running timer blender makes
+    _sock = None # Holds the udp socket object
+    # _start_time = None
+    _rest_matrix = None  # Stored calibrated wrist rest-pose matrix
+    # Pressing "C" forces reset, allowing for recalibration - IMPORTANT!!!!!
+    # Likes to go out of alignment if left running too long, this helps fix
+
     # Class var creation
 
     def modal(self, context, event):
-        if event.type == 'TIMER':
-            self.poll_socket(context)
+        if event.type == 'TIMER': # Is this event a timer tick, or the default case
+            self.poll_socket(context) # Check UDP for new data
 
-        if event.type == 'C' and event.value == 'PRESS':
-            self._rest_matrix = None
+        if event.type == 'C' and event.value == 'PRESS': # If user presses C
+            self._rest_matrix = None # Clears rest pose
             print("Wrist rest pose cleared -- will recalibrate on next frame.")
 
-        if event.type == 'ESC':
-            self.cancel(context)
-            return {'CANCELLED'}
+        if event.type == 'ESC': # Checks for esc
+            self.cancel(context) # Calls cleanup and stuff
+            return {'CANCELLED'} # Tells blender its done
 
-        return {'PASS_THROUGH'}
+        return {'PASS_THROUGH'} # Returned for evey non-esc event
+    # This function gets called for every events and decides what to do depending on the event type
 
     def update_wrist_rotation(self, armature, landmarks):
-        bone = armature.pose.bones.get(PALM_BONE_NAME)
+        bone = armature.pose.bones.get(PALM_BONE_NAME) # Gets the palm bone name from armature pose bones
         if bone is None:
             return
+        # If bone doesnt exist return instead of imploding
 
-        current_matrix = hand_basis_matrix(landmarks)
+        current_matrix = hand_basis_matrix(landmarks) # Calls the basis axis builder
 
-        if self._rest_matrix is None:
-            self._rest_matrix = current_matrix
+        if self._rest_matrix is None: # Checks if calibration has hapened yet
+            self._rest_matrix = current_matrix # If not calibrated, this frame is used as the reference frame
             print("Calibrated wrist rest pose.")
             return
 
-        relative = self._rest_matrix.inverted() @ current_matrix
-        relative_quat = relative.to_quaternion()
+        relative = self._rest_matrix.inverted() @ current_matrix # Computes how much the wrist has moved since calibration
+        relative_quat = relative.to_quaternion() # Converts that relative rotation to quaternion vector
 
-        # Y = long axis (wrist -> fingers) = roll/twist axis
-        swing, twist = swing_twist(relative_quat, mathutils.Vector((0, 1, 0)))
+        swing, twist = swing_twist(relative_quat, mathutils.Vector((0, 1, 0))) # Gets wrist pitch (swing) and twist (roll)
 
-        roll = twist.angle if twist.axis.y >= 0 else -twist.angle
-        pitch = swing.to_euler(EULER_ORDER)[0]  # swing has no roll component left, so this is clean
-        computed = [pitch, roll, 0.0]
+        roll = twist.angle if twist.axis.y >= 0 else -twist.angle # Gets signed roll angle from twist vector
+        # Checks if twist axis points along +Y or -Y and flips sign for consistancy
+        pitch = swing.to_euler(EULER_ORDER)[0] # Converts pitch (swing) to Euler and takes X has the pitch
+        computed = [pitch, roll, 0.0] # Puts the computed angles + placeholder for yaw
+        # --NEED TO ADD YAW FOR J TO WORK--
 
-        bone.rotation_mode = EULER_ORDER
-        rotation = [0.0, 0.0, 0.0]
-        for i in range(3):
+        bone.rotation_mode = EULER_ORDER # Set bone to use Euler (makes more sense to me so i choose it)
+        rotation = [0.0, 0.0, 0.0] # Initalzie rotation array
+        for i in range(3): # i goes from 0,1,2
+            # 0 is pitch, this gets negated and written into Z rotation
+            # 1 is roll, this doesnt get negated and gets writen into Y rotation
+            # 2 is yaw, goes into X rotation
             rotation[PALM_AXIS_MAP[i]] = computed[i] * PALM_AXIS_SIGN[i]
-        bone.rotation_euler = tuple(rotation)
+            # This here maps each computed value to the bone axis that should be driven. 
+        bone.rotation_euler = tuple(rotation) # Apply final rotation
+    # This function calculates the wrist rotations relative to the calibrated rest pose
 
     def apply_base_joint(self, armature, bone_name, landmarks, points, forward, side,
                           curl_amplitude, curl_scale, spread_amplitude):
+        
         bone = armature.pose.bones.get(bone_name)
         if bone is None:
             print(f"Bone '{bone_name}' not found")
@@ -287,7 +302,8 @@ class LandmarkReceiver(bpy.types.Operator):
         rotation[CURL_AXIS] = curl
         rotation[SPREAD_AXIS] = spread
         bone.rotation_euler = tuple(rotation)
-
+# This works with the knuckle, or the base "joint" of ur finger (from MCP to PIP)
+# Similar to wrist, it gets the rotations and applies them to said joints
 
     def apply_thumb1_joint(self, armature, landmarks):
         bone = armature.pose.bones.get("Thumb1")
@@ -424,12 +440,13 @@ class LandmarkReceiver(bpy.types.Operator):
 
 def register():
     bpy.utils.register_class(LandmarkReceiver)
-
+# Registers the above class with blender, letting it be called via bpy.ops.wm.landmark_receiver()
 
 def unregister():
     bpy.utils.unregister_class(LandmarkReceiver)
-
+# Undoes the previous, cleanup step
 
 if __name__ == "__main__":
     register()
     bpy.ops.wm.landmark_receiver()
+# Calls register then runs the operator, starting the lister loop
