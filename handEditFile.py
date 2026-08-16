@@ -271,10 +271,10 @@ class LandmarkReceiver(bpy.types.Operator):
 
         roll = twist.angle if twist.axis.y >= 0 else -twist.angle # Gets signed roll angle from twist vector
         # Checks if twist axis points along +Y or -Y and flips sign for consistancy
-        swing_euler = swing.to_euler(EULER_ORDER) # Decompose swing once, reuse for both pitch and yaw
-        pitch = swing_euler[0] # X component of swing = pitch
-        yaw = swing_euler[2] # Z component of swing = yaw (twist about Y already removed, so this is the remaining DOF)
-        computed = [pitch, roll, yaw] # Now yaw is live instead of hardcoded 0.0
+        swing_euler = swing.to_euler(EULER_ORDER) # Converts quaternion rotation to euler
+        pitch = swing_euler[0] # X component of swing (pitch)
+        yaw = swing_euler[2] # Z component of swing (yaw) 
+        computed = [pitch, roll, yaw] # Places computed values here
 
         bone.rotation_mode = EULER_ORDER # Set bone to use Euler (makes more sense to me so i choose it)
         rotation = [0.0, 0.0, 0.0] # Initalzie rotation array
