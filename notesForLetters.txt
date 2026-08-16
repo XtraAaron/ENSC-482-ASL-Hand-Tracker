@@ -1,0 +1,31 @@
+FC = Full curl
+Base = Calibration Position
+
+
+        Palm   Thumb1   Thumb2   Index1   Index2   Index3   Middle1   Middle2   Middle3   Ring1   Ring2   Ring3   Pinky1   Pinky2   Pinky3   
+A -     Base   Base     Base     FC       FC       FC       FC        FC        FC        FC      FC      FC      FC       FC       FC
+B - 
+C -
+D -
+E -
+F -
+G -
+H -
+I -
+J -
+K -
+L -
+M -
+N -
+O -
+P -
+Q -
+R -
+S -
+T -
+U -
+V -
+W -
+X -
+Y -
+Z -
