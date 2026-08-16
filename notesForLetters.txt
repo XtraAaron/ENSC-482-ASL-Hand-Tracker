@@ -1,48 +1,49 @@
 Palm
     Base: B
-    Roll in: RI (For letters such as C or D)
-    Roll out: RO (For letters such as G or P)
+    Roll: R (For letters such as C or D)
     Roll and Pitch: RP
-    Sway (Need to add, ignored for now): S
+    Sway: S (Always in 1 direction)
 
-Fingers
+Tree format
+    Start with Wrist as general classification
 
 Q Doesnt really work tbh, might skip and put in future improvments?
 
-        Palm   Thumb1   Thumb2   Index1   Index2   Index3   Middle1   Middle2   Middle3   Ring1   Ring2   Ring3   Pinky1   Pinky2   Pinky3   
-A -     B      B        B        FC       FC       FC       FC        FC        FC        FC      FC      FC      FC       FC       FC
-B - 
-C -
-D -
-E -
-F -
-G -
-H -
-I -
-J -
-K -
-L -
-M -
-N -
-O -
-P -
-Q -
-R -
-S -
-T -
-U -
-V -
-W -
-X -
-Y -
-Z -
+    Palm   Thumb1   Thumb2   Index1   Index2   Index3   Middle1   Middle2   Middle3   Ring1   Ring2   Ring3   Pinky1   Pinky2   Pinky3   
+A - B      B        B        FC       FC       FC       FC        FC        FC        FC      FC      FC      FC       FC       FC
+B - B
+C - R
+D - R
+E - B
+F - B
+G - S
+H - S
+I - B
+J - S
+K - B
+L - B
+M - B
+N - B
+O - R
+P - S
+Q - RP
+R - B
+S - B
+T - B
+U - B
+V - B
+W - B
+X - R
+Y - B
+Z - B
 
 
 Rotational Values (X,Y,Z)
+Note: Under future improvments, improve this range is prob smth to put down too
 
 Palm
-    Base: (0, -0.175 - 0.112, -0.052 - 0.299)
-    Roll in: (0, 0.260 - , )
-    Roll out: (0, , )
-    Roll and Pitch: 
+    Base: (0.024 - 0.241, -0.175 - 0.112, -0.065 - 0.299)
+    Roll in: (0. - 0., -0. - 0., -0. - 0.)
+    Roll out: (0. - 0., -0. - 0., -0. - 0.)
+    Roll and Pitch: (0. - 0., -0. - 0., -0. - 0.)
     Sway (Need to add, ignored for now)
