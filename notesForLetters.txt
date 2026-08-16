@@ -7,7 +7,7 @@ Palm
 
 Fingers
 
-Sway is needed for H, J (Maybe G, P and Q)
+Q Doesnt really work tbh, might skip and put in future improvments?
 
         Palm   Thumb1   Thumb2   Index1   Index2   Index3   Middle1   Middle2   Middle3   Ring1   Ring2   Ring3   Pinky1   Pinky2   Pinky3   
 A -     B      B        B        FC       FC       FC       FC        FC        FC        FC      FC      FC      FC       FC       FC

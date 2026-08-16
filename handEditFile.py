@@ -94,7 +94,7 @@ EULER_ORDER = 'XYZ' # Defined how blender should accept the Euler Rotation
 
 # Literally if you have ur fingers pointed forwards, its the same sorta deal as a plane 
 PALM_AXIS_MAP = [2, 1, 0] # Defines the bone components each euler drives, so pitch goes to z, roll to y, and yaw to x
-PALM_AXIS_SIGN = [-1, 1, 0] # Defines the direction of the axis
+PALM_AXIS_SIGN = [-1, 1, 1] # Defines the direction of the axis
 
 def vector(p_from, p_to):
     return (p_to[0] - p_from[0], p_to[1] - p_from[1], p_to[2] - p_from[2])
@@ -271,9 +271,10 @@ class LandmarkReceiver(bpy.types.Operator):
 
         roll = twist.angle if twist.axis.y >= 0 else -twist.angle # Gets signed roll angle from twist vector
         # Checks if twist axis points along +Y or -Y and flips sign for consistancy
-        pitch = swing.to_euler(EULER_ORDER)[0] # Converts pitch (swing) to Euler and takes X has the pitch
-        computed = [pitch, roll, 0.0] # Puts the computed angles + placeholder for yaw
-        # --NEED TO ADD YAW FOR J TO WORK--
+        swing_euler = swing.to_euler(EULER_ORDER) # Decompose swing once, reuse for both pitch and yaw
+        pitch = swing_euler[0] # X component of swing = pitch
+        yaw = swing_euler[2] # Z component of swing = yaw (twist about Y already removed, so this is the remaining DOF)
+        computed = [pitch, roll, yaw] # Now yaw is live instead of hardcoded 0.0
 
         bone.rotation_mode = EULER_ORDER # Set bone to use Euler (makes more sense to me so i choose it)
         rotation = [0.0, 0.0, 0.0] # Initalzie rotation array
