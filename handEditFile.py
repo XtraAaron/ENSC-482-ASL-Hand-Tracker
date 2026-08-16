@@ -6,10 +6,13 @@ import time # Time stuff
 import mathutils # Vector math stuff
 # The import stuff
 
-# UDP stuff, we using udp rn to send data between the py code and the blender stuff
+# UDP stuff, we using udp rn to send data between the py code and the blender stuff and the cpp code
 UDP_IP = "127.0.0.1"
 UDP_PORT = 5052
 NUM_FLOATS = 21 * 3
+
+OUT_UDP_IP = "127.0.0.1"
+OUT_UDP_PORT = 5053
 
 ARMATURE_NAME = "Armature"
 # Under the downloaded rig, the name of the of the bone thing
@@ -225,6 +228,7 @@ class LandmarkReceiver(bpy.types.Operator):
 
     _timer = None # Stores the reference to the running timer blender makes
     _sock = None # Holds the udp socket object
+    _out_sock = None # Same deal but for output socket
     # _start_time = None
     _rest_matrix = None  # Stored calibrated wrist rest-pose matrix
     # Pressing "C" forces reset, allowing for recalibration - IMPORTANT!!!!!
@@ -451,8 +455,39 @@ class LandmarkReceiver(bpy.types.Operator):
                                PINKY1_CURL_AMPLITUDE, PINKY1_CURL_SCALE, PINKY1_SPREAD_AMPLITUDE)
         self.apply_curl_joint(armature, "Pinky2", landmarks, 17, 18, 19, PINKY2_CURL_AMPLITUDE)
         self.apply_curl_joint(armature, "Pinky3", landmarks, 18, 19, 20, PINKY3_CURL_AMPLITUDE)
+
+        self.send_bone_rotations(armature) # Sends out the UDP stuff
     # This function reads a UDP packet, unpacks it, and calls the respective joint rotation functions
     # It drives the armature's pose for the current frame
+
+
+    def send_bone_rotations(self, armature):
+            bone_order = [
+                "Palm", "Thumb1", "Thumb2",
+                "Index1", "Index2", "Index3",
+                "Middle1", "Middle2", "Middle3",
+                "Ring1", "Ring2", "Ring3",
+                "Pinky1", "Pinky2", "Pinky3",
+            ]
+            # The order the bones will be read and sent
+            # Order is arbitrary, but matched poll_socket order for consistancy
+
+            flat_values = [] # Will hold all 45 floats
+            # 15 bones x 3 axis
+            for bone_name in bone_order: # Loops over each bone
+                bone = armature.pose.bones.get(bone_name) # Gets the bone name
+                if bone is None:
+                    flat_values.extend([0.0, 0.0, 0.0])
+                    print(f"Failed to get bone '{bone_name}'")
+                    continue
+                # If bone no exists, pad instead of skipping to ensure consistant size
+                rot = bone.rotation_euler # Grabs bones current euler rotation
+                flat_values.extend([rot[0], rot[1], rot[2]]) # Shoves the bone's xyz rotation values into the flat list
+
+            packet = struct.pack(f"{len(flat_values)}f", *flat_values) # Packs floats into raw bytes
+            self._out_sock.sendto(packet, (OUT_UDP_IP, OUT_UDP_PORT)) # Sends the pack out
+    # This function gets the current rotational valeus of all 15 tracked bones, and flattens into a long list of floats
+    # Then it sends out the data
 
 
     def execute(self, context):
@@ -462,10 +497,11 @@ class LandmarkReceiver(bpy.types.Operator):
             return {'CANCELLED'}
         # Error handling
 
-        self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Crates a UDP socket
+        self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Crates a UDP socket for inpit
         self._sock.bind((UDP_IP, UDP_PORT)) # Binds the socket to listen on 127.0.0.1:5052 to listen for mediapipe stuff
         self._sock.setblocking(False) # Sets socket to be non-blocking
         # So if no data is avaliable, instead of freezing it raises an error instead
+        self._out_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Creates UDP socket for output
 
         #self._start_time = time.time() 
 
@@ -493,7 +529,10 @@ class LandmarkReceiver(bpy.types.Operator):
         wm.event_timer_remove(self._timer) # Unregisters timer handle
         if self._sock:
             self._sock.close()
-        # Checks if a socket exists, if so closeit
+        # Checks if a input socket exists, if so closeit
+        if self._out_sock:
+            self._out_sock.close()
+        # Repeat for output socket
         print("Landmark receiver stopped.")
     # Cleanup function
 
