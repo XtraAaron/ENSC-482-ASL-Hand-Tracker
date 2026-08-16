@@ -6,7 +6,7 @@ D is same, part of the issue itself is the finger lengths themselves
 E kinda works? Doesnt work as well cuz of the model tho, the actions are correct tho. Distinct Enough
 F Looks weird due to lengths, but i think distinct Enough
 G - Works fairly solid? Only issue with the sway of the hand not existing, other than that, Distinct Enough
-H Good
+H Good (angle may need improvment tho with yaw)
 I Good
 J Cant do need wrist sway - Fix
 K sorta, bit weird. Distinct Enough

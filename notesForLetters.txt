@@ -1,9 +1,16 @@
-FC = Full curl
-Base = Calibration Position
+Palm
+    Base: B
+    Roll in: RI (For letters such as C or D)
+    Roll out: RO (For letters such as G or P)
+    Roll and Pitch: RP
+    Sway (Need to add, ignored for now): S
 
+Fingers
+
+Sway is needed for H, J (Maybe G, P and Q)
 
         Palm   Thumb1   Thumb2   Index1   Index2   Index3   Middle1   Middle2   Middle3   Ring1   Ring2   Ring3   Pinky1   Pinky2   Pinky3   
-A -     Base   Base     Base     FC       FC       FC       FC        FC        FC        FC      FC      FC      FC       FC       FC
+A -     B      B        B        FC       FC       FC       FC        FC        FC        FC      FC      FC      FC       FC       FC
 B - 
 C -
 D -
@@ -29,3 +36,13 @@ W -
 X -
 Y -
 Z -
+
+
+Rotational Values (X,Y,Z)
+
+Palm
+    Base: (0, -0.175 - 0.112, -0.052 - 0.299)
+    Roll in: (0, 0.260 - , )
+    Roll out: (0, , )
+    Roll and Pitch: 
+    Sway (Need to add, ignored for now)
