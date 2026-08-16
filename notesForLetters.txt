@@ -7,10 +7,25 @@ Palm
 Tree format
     Start with Wrist as general classification
 
+Needed joints to measure
+    Palm (wrist)
+    Index1
+    Index2
+    Middle1
+    Middle2
+    Ring1
+    Ring2
+    Pinky1
+    Pinky3
+    Thumb1
+    Thumb2
+
+    Spread of Index1 and Middle1
+
 Q Doesnt really work tbh, might skip and put in future improvments?
 
-    Palm   Thumb1   Thumb2   Index1   Index2   Index3   Middle1   Middle2   Middle3   Ring1   Ring2   Ring3   Pinky1   Pinky2   Pinky3   
-A - B      B        B        FC       FC       FC       FC        FC        FC        FC      FC      FC      FC       FC       FC
+    Palm 
+A - B   
 B - B
 C - R
 D - R
