@@ -25,13 +25,15 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 NUM_FLOATS = 21 * 3
 # 21 landmarks per hand, each with x, y, z -> 63 floats
 
-# --- One Euro Filter setup ---
-# One filter per (landmark, axis) -> 21 landmarks x 3 axes (x,y,z)
-FILTER_CONFIG = {'freq': 30, 'mincutoff': 1.0, 'beta': 0.3, 'dcutoff': 1.0}
-filters = [[OneEuroFilter(**FILTER_CONFIG) for _ in range(3)] for _ in range(21)]
-# mincutoff -> lower = smoother when still, dcutoff -> filters the derivative estimate
-# beta -> higher = less lag on fast motion
-# Tune these while watching the Blender viewport if jitter/lag isn't right
+# This section sets up the filters for the landmark data
+# The filter is applied to each coordinate independently before data is sent to blender
+# Therefore 63 filters are needed (21 landmarks for 3 variables each)
+FILTER_CONFIG = {'freq': 30, 'mincutoff': 1.0, 'beta': 0.3, 'dcutoff': 1.0} # Filter tuning parameters
+# Freq is expected sampling rate; 30 selected to match usual capture rate
+# Mincutoff is the minimum cutoff frequency; 1.0 choosen as a moderate baseline
+# Beta is the speed coeficient, or how much the filter reduces lag during rapid movement; 0.3 found to work the best
+# Dcutoff is used specifically for filtering the velocity of the signal; Kept at default since i dont think it'll have much of an effect
+filters = [[OneEuroFilter(**FILTER_CONFIG) for _ in range(3)] for _ in range(21)] # Builds a 21x3 array that holds a filter in each index
 
 BaseOptions = mp.tasks.BaseOptions
 HandLandmarker = mp.tasks.vision.HandLandmarker
@@ -90,7 +92,7 @@ def main():
     start_time = time.time()
     # Used to compute real millisecond timestamps for each frame
     # MediaPipe uses it for motion and continuity between frames
-    frame_count = 0
+    frame_count = 0 # Initalize framecounter for debugging
     with HandLandmarker.create_from_options(options) as landmarker: # Builds the detector object using the defined options
         while True:
             ret, frame = cap.read() # Grabs a frame from the camera
@@ -106,7 +108,7 @@ def main():
             # Frame.shape for a color image is (height, width, channels)
 
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # Convert BGR (OpenCV default) to RGB (MediaPipe expected)
-            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame) # Wrap the raw numpy pixel array into MP's  image type
+            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame) # Wrap the raw pixel array into MP's image type
 
             frame_timestamp_ms = int((time.time() - start_time) * 1000)
             # Real elapsed time in milliseconds since start
@@ -119,19 +121,22 @@ def main():
                 # Only draws if at least one hand is detected
 
                 first_hand = result.hand_landmarks[0]
-                # Take just the first detected hand for this first test
+                # Take the first detected hand's landmarks
 
                 frame_t = frame_timestamp_ms / 1000.0
-                # One Euro Filter wants seconds, not ms
+                # Converts the frame's timestap from ms to s, since thats what the filter wants
 
-                flat_values = []
-                for i, landmark in enumerate(first_hand):
-                    fx = filters[i][0](landmark.x, frame_t)
-                    fy = filters[i][1](landmark.y, frame_t)
-                    fz = filters[i][2](landmark.z, frame_t)
+                flat_values = [] # Initalize array to hold filtered values
+                for i, landmark in enumerate(first_hand): # Loop over each landmark
+                    fx = filters[i][0](landmark.x, frame_t) # Filter x by passing into respective filter
+                    fy = filters[i][1](landmark.y, frame_t) # Filter y by passing into respective filter
+                    fz = filters[i][2](landmark.z, frame_t) # Filter z by passing into respective filter
+                    
                     flat_values.append(fx)
                     flat_values.append(fy)
                     flat_values.append(fz)
+                    # Applies the filtered values to the array
+                # Does the actual filtering stuff
                 
                 # frame_count += 1
                 # if frame_count % 30 == 0:

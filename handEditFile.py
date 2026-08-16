@@ -285,26 +285,37 @@ class LandmarkReceiver(bpy.types.Operator):
     def apply_base_joint(self, armature, bone_name, landmarks, points, forward, side,
                           curl_amplitude, curl_scale, spread_amplitude):
         
-        bone = armature.pose.bones.get(bone_name)
+        bone = armature.pose.bones.get(bone_name) # Get target bone name
         if bone is None:
             print(f"Bone '{bone_name}' not found")
             return
+        # See wrist, same deal
 
         bend = joint_bend_curl_only(landmarks, points[0], points[1], points[2], side) * curl_scale
+        # Computes the angle of the curl between the 3 joint points of the Wrist, MCP, and PIP
+
+        # MCP stands for Metacarpophalangeal joint apparently
+        # Pip stands for Proximal Interphalangeal joint
+        # This is not at all useful, just somewhat interesting ig
+
         curl = clamp(-bend, -curl_amplitude, 0.0)
+        # Negates the bend, since its positive in its natural state, however this rig has curl from 0 to -curl_amplitude
+        # Also restricts the curl to be in the bounds as stated above 
 
-        finger_vec = vector(landmarks[points[1]], landmarks[points[2]])
-        spread_raw = spread_angle(finger_vec, forward, side)
-        spread = clamp(spread_raw, -spread_amplitude, spread_amplitude)
+        finger_vec = vector(landmarks[points[1]], landmarks[points[2]]) # Builds a vector from MCP to PIP
+        spread_raw = spread_angle(finger_vec, forward, side) # Computes the raw spread relative to the hand's local axis
+        spread = clamp(spread_raw, -spread_amplitude, spread_amplitude) # Clamps the result to the allowed range
 
-        bone.rotation_mode = 'XYZ'
-        rotation = [0.0, 0.0, 0.0]
-        rotation[CURL_AXIS] = curl
-        rotation[SPREAD_AXIS] = spread
-        bone.rotation_euler = tuple(rotation)
+        bone.rotation_mode = 'XYZ' # Euler type is XYZ for this
+        rotation = [0.0, 0.0, 0.0] # Initazlie array
+        rotation[CURL_AXIS] = curl # Give the curl axis the angle of curl (Z)
+        rotation[SPREAD_AXIS] = spread # Give spread axis the angle of spread (X)
+        bone.rotation_euler = tuple(rotation) # Apply rotation
 # This works with the knuckle, or the base "joint" of ur finger (from MCP to PIP)
 # Similar to wrist, it gets the rotations and applies them to said joints
 
+
+# Gunna ignore the similar stuff to what we've seen b4, check above if ur somehow confused
     def apply_thumb1_joint(self, armature, landmarks):
         bone = armature.pose.bones.get("Thumb1")
         if bone is None:
@@ -312,20 +323,27 @@ class LandmarkReceiver(bpy.types.Operator):
             return
 
         basis = hand_basis_matrix(landmarks)
-        across_axis = basis.col[0]   # index-to-pinky direction
-        normal_axis = basis.col[2]   # palm normal
+        across_axis = basis.col[0] # Index to pinky axis (across the knuckles), pulls X column
+        normal_axis = basis.col[2] # Normal to the palm (vector pointing out), pulls Z column
 
-        thumb1_vec = vector(landmarks[2], landmarks[3])  # MCP1 -> IP1
+        thumb1_vec = vector(landmarks[2], landmarks[3]) # Builds a vector from MCP1 to IP1 to represent thumb1 direction
 
-        angle_x = angle_between(thumb1_vec, across_axis)
-        angle_z = angle_between(thumb1_vec, normal_axis)
+        # IP stands for Interphalangeal joint, again not important
+
+        angle_x = angle_between(thumb1_vec, across_axis) # Angle between thumb1 vec and palm normal axis vector
+        angle_z = angle_between(thumb1_vec, normal_axis) # Angle between thumb1 vec and index to pinky axis vector
 
         bone.rotation_mode = 'XYZ'
         rotation = [0.0, 0.0, 0.0]
-        rotation[0] = (angle_x - 1.6) * 1
-        rotation[1] = 0.0
-        rotation[2] = (angle_z - 1.6) * 1
-        bone.rotation_euler = tuple(rotation)
+        rotation[0] = (angle_x - 1.6) * 1 # Writes X rotation
+        rotation[1] = 0.0 # Y causes the thumb to rotate on the spot, so I forced it to be 0
+        rotation[2] = (angle_z - 1.6) * 1 # Write Z rotation
+        # The *1 was used for scaling, to help tune it
+        # the -1.6 (~pi/2) was used to help tune the thumb, as without it, the thumb gets angled weirdly
+        bone.rotation_euler = tuple(rotation) 
+        # The usage of X and Z was found through testing of thumb movements
+    # This function is like b4, but specific for thumb1 cuz it sucked to make, and didnt like to work.
+    # Also due to the nature of the opposible thumb, i found it easier to just make a new function specific for it
         
         
     def apply_thumb2_joint(self, armature, landmarks):
@@ -334,12 +352,19 @@ class LandmarkReceiver(bpy.types.Operator):
             print("Bone 'Thumb2' not found")
             return
 
-        bend = joint_bend(landmarks, 1, 2, 4)
+        bend = joint_bend(landmarks, 1, 2, 4) # Computes the angle at MCP1 between following vectors
+        # CMC1 to MCP1, and MCP1 to TIP1
         curl = ((math.pi / 2) - clamp(-bend, -THUMB2_CURL_AMPLITUDE, 0.0) - 1.6) * 1.2
+        # Compound formula
+        # clamp(-bend, -THUMB2_CURL_AMPLITUDE, 0.0): same deal as we've seen before
+        # (math.pi / 2) - (clamped value): Flips sign/direction to ensure it rotates in the right direction
+        # -1.6 gives an offset as mentioned b4
+        # 1.2 is used as a scaling factor to make it more accurate
 
         bone.rotation_mode = 'XYZ'
         rotation = [curl, 0.0, 0.0]
         bone.rotation_euler = tuple(rotation)
+    # Deals with the rotaion of thumb2 (IP1 to TIP1)
 
 
     def apply_curl_joint(self, armature, bone_name, landmarks, idx_a, idx_b, idx_c, curl_amplitude,
@@ -349,30 +374,41 @@ class LandmarkReceiver(bpy.types.Operator):
             print(f"Bone '{bone_name}' not found")
             return
 
-        bend = joint_bend(landmarks, idx_a, idx_b, idx_c)
-        curl = clamp(-bend, -curl_amplitude, 0.0)
+        bend = joint_bend(landmarks, idx_a, idx_b, idx_c) # Computes the angle at the middle landmark
+        # So either DIP or PIP, depending on which finger segment we are dealing with
+        curl = clamp(-bend, -curl_amplitude, 0.0) # Clamp and negate the value
 
         bone.rotation_mode = 'XYZ'
         rotation = [0.0, 0.0, 0.0]
-        rotation[curl_axis] = curl
+        rotation[curl_axis] = curl # Writes in the the curl axis (Z)
         bone.rotation_euler = tuple(rotation)
+    # Generic curl function, used to handle the stuff from TIP to DIP and DIP to PIP, as they dont need spread
+
+    # DIP means Distal Interphalangeal joint
 
     def poll_socket(self, context):
         try:
             data, _addr = self._sock.recvfrom(4096)
         except BlockingIOError:
             return
+        # Attempt to read the UDP socket data
+        # If no packet has arrived, catch error and exit
 
-        flat = struct.unpack(f"{NUM_FLOATS}f", data)
+        flat = struct.unpack(f"{NUM_FLOATS}f", data) # Unpack raw data into 63 NUM_FLOATS
         landmarks = [
             (flat[i * 3], flat[i * 3 + 1], flat[i * 3 + 2])
             for i in range(21)
         ]
+        # Regroups the data into 21 tuples
 
         armature = bpy.data.objects.get(ARMATURE_NAME)
         if armature is None:
             print(f"Armature '{ARMATURE_NAME}' not found")
             return
+        # Gets the armature on each call
+
+        # All the stuff below is the update code
+        # It calls the rotational code for the respective hand part
 
         # --- Wrist/Palm ---
         self.update_wrist_rotation(armature, landmarks)
@@ -382,12 +418,15 @@ class LandmarkReceiver(bpy.types.Operator):
         self.apply_thumb2_joint(armature, landmarks)
 
         # --- Fingers ---
-        forward = normalize(vector(landmarks[0], landmarks[9]))
+        forward = normalize(vector(landmarks[0], landmarks[9])) # Builds a vector from the wrist, from Wrist to MCP3
+        # This is the cloest things to a "centerline" for the hand using the mediapipe vectors
         palm_normal = normalize(cross(
-            vector(landmarks[0], landmarks[5]),
-            vector(landmarks[0], landmarks[17]),
+            vector(landmarks[0], landmarks[5]), # Wrist to MCP5
+            vector(landmarks[0], landmarks[17]), # Wrist to MCP 17
         ))
-        side = normalize(cross(palm_normal, forward))
+        side = normalize(cross(palm_normal, forward)) # This takes the noramlized cross product between the normal and the forward
+        # This results in the normalized index to pinky vector
+        # P much Right Hand Rule from physics
 
         # --- Index ---
         self.apply_base_joint(armature, "Index1", landmarks, (0, 5, 6), forward, side,
@@ -412,31 +451,51 @@ class LandmarkReceiver(bpy.types.Operator):
                                PINKY1_CURL_AMPLITUDE, PINKY1_CURL_SCALE, PINKY1_SPREAD_AMPLITUDE)
         self.apply_curl_joint(armature, "Pinky2", landmarks, 17, 18, 19, PINKY2_CURL_AMPLITUDE)
         self.apply_curl_joint(armature, "Pinky3", landmarks, 18, 19, 20, PINKY3_CURL_AMPLITUDE)
+    # This function reads a UDP packet, unpacks it, and calls the respective joint rotation functions
+    # It drives the armature's pose for the current frame
+
 
     def execute(self, context):
-        armature = bpy.data.objects.get(ARMATURE_NAME)
+        armature = bpy.data.objects.get(ARMATURE_NAME) # Gets the armature object by name
         if armature is None:
             print(f"Armature '{ARMATURE_NAME}' not found")
             return {'CANCELLED'}
+        # Error handling
 
-        self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self._sock.bind((UDP_IP, UDP_PORT))
-        self._sock.setblocking(False)
+        self._sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Crates a UDP socket
+        self._sock.bind((UDP_IP, UDP_PORT)) # Binds the socket to listen on 127.0.0.1:5052 to listen for mediapipe stuff
+        self._sock.setblocking(False) # Sets socket to be non-blocking
+        # So if no data is avaliable, instead of freezing it raises an error instead
 
-        self._start_time = time.time()
+        #self._start_time = time.time() 
 
-        wm = context.window_manager
-        self._timer = wm.event_timer_add(0.01, window=context.window)
-        wm.modal_handler_add(self)
-        return {'RUNNING_MODAL'}
+        wm = context.window_manager # Get blender window manager, needed to register timers and modal handler
+        self._timer = wm.event_timer_add(0.01, window=context.window) # Creates the reoccuring timer
+        # Sets it to run every 0.01 seconds
+        wm.modal_handler_add(self) # Every time blender's event loop sends an event, it checks the event list and calls .modal(context, event) on every registered operator
+        # Now this includes modal function we created earlier
+        return {'RUNNING_MODAL'} # Tell blender the operation isnt done, keep it running and keep dispatching events to modal until smth tells it otherwise
+    # Does all the one time setup and hands control over to the modal system so modal gets called repeatedly
+    # Those calls run modal over and over again, with each one being a fresh execution of the method body
+
+    # Modal is smth that takes over input handling, and stays active across multiple events or interactions
+
+    # So the code starts by running execute once (see below)
+    # Then on the first cycle, it runs TIMER event, which runs modal once. This wont get UDP packets tho
+    # Then on the second cycle, it runs TIMER event, .01 second later. Thir runs modal, and gets the UDP packets needed.
+    # Since it succeeded it now is able to run poll socket, which calls the rotation and other stuff. Rince and repeat
+    # The loop itself exists inside blender itself. Its like a while true in C. It waits for the event, and dispatches when needed
+    # An event is a bit of data discribing that something happened, for this code its passed into modal
+    # 
 
     def cancel(self, context):
-        wm = context.window_manager
-        wm.event_timer_remove(self._timer)
+        wm = context.window_manager # Gets window manager
+        wm.event_timer_remove(self._timer) # Unregisters timer handle
         if self._sock:
             self._sock.close()
+        # Checks if a socket exists, if so closeit
         print("Landmark receiver stopped.")
-
+    # Cleanup function
 
 def register():
     bpy.utils.register_class(LandmarkReceiver)
@@ -448,5 +507,5 @@ def unregister():
 
 if __name__ == "__main__":
     register()
-    bpy.ops.wm.landmark_receiver()
+    bpy.ops.wm.landmark_receiver() # Always calls execute once
 # Calls register then runs the operator, starting the lister loop
