@@ -10,6 +10,7 @@ enum wristState { // Enum for the wrist state, makes it ez to track
     ROLL, // Roll state
     ROLL_AND_PITCH, // RP state
     YAW, // Yaw state
+    REVERSE_ROLL, // Number state
     UNKNOWN // We dont know what state its in rn, if its this dont do anything
 };
 
@@ -48,27 +49,29 @@ void printBoneRotation(const std::vector<std::vector<float>>& rotations, int bon
 wristState returnWristState(const std::vector<std::vector<float>>& rotations) {
     // Can't use switch due to range
     // First comparison is for min coords, second max coords
-    if (rotations[0] >= std::vector<float>{0.215, 0.700, 0.035} &&
-        rotations[0] <= std::vector<float>{0.420, 2.100, 0.215}){ // Roll state
+    if (rotations[0][1] >= 0.700 && rotations[0][1] <= 2.200) { // Roll state
         std::cout << "This is in roll state hot dog flavoured water\n\n";
         return ROLL;
     } // Roll placed at top, as it helps deal with base overlapping with its boundry sometime
-    // Now roll take priority
+    else if (rotations[0][1] >= 2.200 && rotations[0][1] <= 3.100) { // Reverse state
+        std::cout << "This is in Reverse State state\n\n";
+        return REVERSE_ROLL;
+    } // Basically divide roll into 2 sections, reversed wrist and sideways
     else if (rotations[0] >= std::vector<float>{-0.100, -0.175, -0.300} &&  
         rotations[0] <= std::vector<float>{0.245, 0.115, 0.300}){ // Base state
         std::cout << "This is in base state\n\n";
         return BASE;
     }
-    else if (rotations[0] >= std::vector<float>{-0.050, -0.195, -0.005} &&
-        rotations[0] <= std::vector<float>{1.250, 0.075, 0.235}){ // Yaw state
-        std::cout << "This is in yaw state\n\n";
-        return YAW;
-    }    
-    else if (rotations[0] >= std::vector<float>{0.705, -1.900, -0.400} &&
-        rotations[0] <= std::vector<float>{0.975, -1.300, 0.005}){ // Roll and pitch state
+    else if (rotations[0][0] >= 0.600 && rotations[0][0] <= 1.00 &&
+            rotations[0][1] >= -2.000 && rotations[0][1] <= -1.000 &&
+            rotations[0][2] >= -0.500 && rotations[0][2] <= 0.100) { // Roll and pitch state
         std::cout << "This is in roll and pitch state\n\n";
         return ROLL_AND_PITCH;
-    } // Roll and pitch lowest priority cuz Q is a single letter, and its finiky with the current code
+    } // Put roll and pitch b4 yaw since yaw is more general, filter out the more specilized state first
+    else if (rotations[0][0] >= -0.050 && rotations[0][0] <= 1.250) { // Yaw state
+        std::cout << "This is in yaw state\n\n";
+        return YAW;
+    }
     else {
         std::cout << "Current state is unknown\n\n";
         return UNKNOWN;

@@ -3,8 +3,11 @@ Palm
     Roll: R (For letters such as C or D)
     Roll and Pitch: RP
     Yaw: Y (Always in 1 direction)
+    Reverse Palm: RP (Extreme roll for #s)
 
 Thumb1 on more of a case by case basis due to opposible nature
+Should note, this works if the user is actually intending to do the correct method
+If we wanted to check correctness, we would need to check every bone
 
 Tree format
     Start with Wrist as general classification
@@ -26,33 +29,45 @@ Needed joints to measure
 
 Q Doesnt really work tbh, might skip and put in future improvments?
 
-    Palm 
-A - B   
-B - B
-C - R
-D - R
-E - B
-F - B
-G - Y
-H - Y
-I - B
-J - Y
-K - B
-L - B
-M - B
-N - B
-O - R
-P - Y
-Q - RP
-R - B
-S - B
-T - B
-U - B
-V - B
-W - B
-X - R
-Y - B
-Z - B
+Numbers 
+    1 - RP
+    2 - RP
+    3 - RP
+    4 - RP
+    5 - RP
+    6 - Same as W if it can track W it can track 6
+    7 - B - Need to integrate
+    8 - B - Need to integrate
+    9 - Same as F if it can track F it can track 9
+    10 - Y
+
+Palm 
+    A - B   
+    B - B
+    C - R
+    D - R
+    E - B
+    F - B
+    G - Y
+    H - Y
+    I - B
+    J - Y
+    K - B
+    L - B
+    M - B
+    N - B
+    O - R
+    P - Y
+    Q - RP
+    R - B
+    S - B
+    T - B
+    U - B
+    V - B
+    W - B
+    X - R
+    Y - B
+    Z - B
 
 Note, Y = S, originally it was sway (S) renamed it to yaw (Y)
 
@@ -70,12 +85,36 @@ Palm
 (0.683 - 0.922, -0.045 -  0.075,  0.165 - 0.222) - Old Yaw
 
 Thumb1
+
+
 Thumb2
+    Full Extend:
+    Full Curl: 
+
 Index1
+
+
 Index2
+    Full Extend:
+    Full Curl: 
+
 Middle1
+
+
 Middle2
+    Full Extend:
+    Full Curl: 
+
 Ring1
+
+
 Ring2
+    Full Extend:
+    Full Curl: 
+
 Pinky1
+
+
 Pinky3
+    Full Extend:
+    Full Curl: 
