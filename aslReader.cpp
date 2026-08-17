@@ -184,13 +184,57 @@ char yawTree(const std::vector<std::vector<float>>& yawTree_rotationMatrix) {
 // Add J to use M1 too (FC)
 
 
-char reverseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatrix) {
+char reverseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatrix) { // For this everything is FE
     std::cout
     << " T1 X: " << reverseTree_rotationMatrix[1][0]
     << " T1 z: " << reverseTree_rotationMatrix[1][2]
     << "\n"; // Debug stuff  
+
+    if (reverseTree_rotationMatrix[1][0] >= -0.675 && reverseTree_rotationMatrix[1][0] <= -0.075 ) { // T1 Out (3, 5)
+        if (reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450 && // P1
+            reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450 && // R1
+            reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450 && // M1
+            reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450) { // I1
+
+            return '5';
+        } // 5
+
+        else if (reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450 && // M1
+                reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450) { // I1
+        
+            return '3'; // Probably should have a check here tbh, but if it detects a 3 good enough for me
+            // Def future work material
+        } // 3
+
+        else {
+            return '-';
+        } // Unknown
+    }
+
+    else { // T1 in (1, 2, 4)
+        if (reverseTree_rotationMatrix[6][2] >= -0.525 && reverseTree_rotationMatrix[6][2] <= -0.050) { // M1
+            if (reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450 && // P1
+                reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450 && // R1
+                reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450) { // I1
+                return '4';
+            } // 4
+
+            else if (reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450) { // I1
+                return '2';
+            }   
+        } // 2, 4
+
+        else if (reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450) { // I1
+            return '1';
+        } // 1
+
+        else {
+            return '+';
+        }
+    } // Since thumb is hidden, dont want to add a constraint, just assume a diff number
+
     return '|'  ;
-}
+} // 
 
 
 void decisionTree(const std::vector<std::vector<float>>& decisionTree_rotationMatrix){
