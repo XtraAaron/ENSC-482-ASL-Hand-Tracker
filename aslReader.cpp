@@ -19,7 +19,7 @@ enum wristState { // Enum for the wrist state, makes it ez to track
 
 // Note, the .bat file only works with g++, need smth different if not using g++
 
-#define TRACKED_BONE 14 // Goes from 0 to 14
+#define TRACKED_BONE 13 // Goes from 0 to 14
 
 /*
 Bone	Index
@@ -33,6 +33,7 @@ Middle2	7
 Ring1	9
 Ring2	10
 Pinky1	12
+Pinky2	13
 Pinky3	14
 */
 
@@ -87,7 +88,7 @@ wristState returnWristState(const std::vector<std::vector<float>>& returnWristSt
         //std::cout << "This is in roll and pitch state\n\n";
         return ROLL_AND_PITCH;
     } // Put roll and pitch b4 yaw since yaw is more general, filter out the more specilized state first
-    else if (returnWristState_RotationMatrix[0][0] >= -0.050 && returnWristState_RotationMatrix[0][0] <= 1.250) { // Yaw state, track X
+    else if (returnWristState_RotationMatrix[0][0] >= 0.000 && returnWristState_RotationMatrix[0][0] <= 1.250) { // Yaw state, track X
         //std::cout << "This is in yaw state\n\n";
         return YAW;
     }
@@ -101,11 +102,11 @@ wristState returnWristState(const std::vector<std::vector<float>>& returnWristSt
 
 char rollTree(const std::vector<std::vector<float>>& rollTree_rotationMatrix){ // ω2 
     // Star with I1
-                std::cout
-                << " I1: " << rollTree_rotationMatrix[3][2]
-                << " M1: " << rollTree_rotationMatrix[6][2]
-                //<< " I2: " << rollTree_rotationMatrix[4][2] 
-                << "\n";      
+                // std::cout
+                // << " I1: " << rollTree_rotationMatrix[3][2]
+                // << " M1: " << rollTree_rotationMatrix[6][2]
+                // //<< " I2: " << rollTree_rotationMatrix[4][2] 
+                // << "\n";      // Debug stuff
     if (rollTree_rotationMatrix[3][2] >= -1.000 && rollTree_rotationMatrix[3][2] <= -0.700) {
         return 'o'; 
     } // Detect O     
@@ -132,30 +133,66 @@ char rollTree(const std::vector<std::vector<float>>& rollTree_rotationMatrix){ /
     else {
         return '+'; // Let "+" be the nothing detected value
     } // None of the above. No letter produced
-    return 'c';
+    return '-'; // Let '-' be the error value if something breaks completly
 }
 // Needs M1, I1, I2
 // C and O are the only "partial" curls used in the tree
+// Covers the Roll tree (see image)
+
+
+char yawTree(const std::vector<std::vector<float>>& yawTree_rotationMatrix) {
+    // Check M1 first (first branch)
+
+    std::cout
+    << " M1: " << yawTree_rotationMatrix[6][2]
+    << "\n"; // Debug stuff
+
+    if (yawTree_rotationMatrix[6][2] >= -0.300 && yawTree_rotationMatrix[6][2] <= -0.070) { // M1 FE (H, P)
+        if (yawTree_rotationMatrix[3][2] >= -0.300 && yawTree_rotationMatrix[3][2] <= -0.100) { // I1 FE
+            return 'h'; 
+        } // H 
+
+        else if (yawTree_rotationMatrix[7][2] >= -0.550 && yawTree_rotationMatrix[7][2] <= -0.000) { // M2 FE
+            return 'p';
+        } // P
+
+        else {
+            return '+';
+        } // Not H or P
+    }
+
+    else if (yawTree_rotationMatrix[6][2] >= -1.610 && yawTree_rotationMatrix[6][2] <= -0.450) { // M1 FC (G, J 10)
+        std::cout << "Yummers this is curling real good\n";
+    }
+
+    return '-';
+} // G H J P 10
+// Uses I1 M1 M2 P1 P2
+// Check J last, cuz it only checks pinky
+// Add J to use M1 too (FC)
 
 
 void decisionTree(const std::vector<std::vector<float>>& decisionTree_rotationMatrix){
     wristState wristEnum = returnWristState(decisionTree_rotationMatrix);
     char temp {};
+    //std::cout << "Current X wrist: " << decisionTree_rotationMatrix[0][0] << '\n';
     switch (wristEnum){
         case BASE:
-            //std::cout << "Ello im a base placeholder\n"; // This will call a whole new function, as w1 is fucking huge
+            std::cout << "Ello im a base placeholder\n"; // This will call a whole new function, as ω1 is fucking huge
             break;
-        case ROLL:
+        case ROLL: // ω2
             temp = rollTree(decisionTree_rotationMatrix);
-            std::cout << "We detected " << temp << "\n";
+            std::cout << "We detected " << temp << "\n"; // Debug
             break;
 
-        case ROLL_AND_PITCH:
-            std::cout << "Ello im a roelplay placeholder\n";
+        case ROLL_AND_PITCH: // ω3
+            temp = 'q'; // Only one letter in Q3, q so just directly set it
+            std::cout << "We detected " << temp << "\n"; // Debug
             break;
 
         case YAW:
-            std::cout << "Ello im a yaw placeholder\n";
+            temp = yawTree(decisionTree_rotationMatrix);
+            std::cout << "We detected " << temp << "\n"; // Debug
             break;
 
         case REVERSE_ROLL:
@@ -163,6 +200,7 @@ void decisionTree(const std::vector<std::vector<float>>& decisionTree_rotationMa
             break;
 
         case UNKNOWN:
+            std::cout << "Galunga\n";
             break;
         default:
             std::cout << "An error has occured in the wrist state";

@@ -39,7 +39,7 @@ Numbers
     7 - B - Need to integrate
     8 - B - Need to integrate
     9 - Same as F if it can track F it can track 9
-    10 - Y
+    10 - Y (Will be modelled as just thumbs up in this case)
 
 Palm 
     A - B   
@@ -49,7 +49,7 @@ Palm
     E - B   
     F - B   
     G - Y   
-    H - Y   
+    H - Y   DONE
     I - B   
     J - Y   
     K - B   
@@ -58,7 +58,7 @@ Palm
     N - B   
     O - R   DONE
     P - Y   
-    Q - RP  
+    Q - RP  - Sometimes works, still not very good
     R - B   
     S - B   
     T - B   
@@ -128,6 +128,10 @@ Ring1
 Ring2
     Full Extend: (0.000, 0.000, -0.229 - -0.039)
     Full Curl:   (0.000, 0.000, -1.600 - -1.071)
+
+Pinky1
+    Full Extend: (0.059 - 0.300, 0.000, -0.442 - -0.227)
+    Full Curl:   (-0.300, 0.000, -1.600 - -1.190)
 
 Pinky1
     Full Extend: (0.059 - 0.300, 0.000, -0.442 - -0.227)
