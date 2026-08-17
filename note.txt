@@ -50,6 +50,8 @@ Using the one euro filter, as it says and i quote "Noisy signals are a common pr
 https://pypi.org/project/OneEuroFilter/
 Need to run pip install OneEuroFilter
 
+Capitals are impossible, so no.
+
 Current bugs: Minor
     1. Wrist bending down appears to cause some rotation, might be hand itself together
     2. Wrist bending down causes fingers to bend

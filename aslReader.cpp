@@ -86,17 +86,32 @@ wristState returnWristState(const std::vector<std::vector<float>>& returnWristSt
 
 char rollTree(const std::vector<std::vector<float>>& rollTree_rotationMatrix){ // ω2 
     // Star with I1
-    if (rollTree_rotationMatrix[3][2] >= -0.225 && rollTree_rotationMatrix[3][2] <= -0.150) { // I1 FE
-        std::cout << "Full extendion detection good\n";
-        return 'x';
-    } // Detects D or X 
-    // Check i2 full curl for x and M1 semi-curl for D
+                std::cout
+                << " I1: " << rollTree_rotationMatrix[3][2]
+                //<< " M1: " << rollTree_rotationMatrix[6][2]
+                //<< " I2: " << rollTree_rotationMatrix[4][2] 
+                << "\n";      
+    if (rollTree_rotationMatrix[3][2] >= -1.000 && rollTree_rotationMatrix[3][2] <= -0.700) {
+        return 'o'; 
+    } // Detect O     
+
+    if (rollTree_rotationMatrix[3][2] >= -0.300 && rollTree_rotationMatrix[3][2] <= -0.100) { // I1 FE (Semi FE for O)
+        if (rollTree_rotationMatrix[6][2] >= -0.950 && rollTree_rotationMatrix[6][2] <= -0.300) { // M1 semi-curl 
+            return 'd';
+        } // Detects D 
+
+        else if (rollTree_rotationMatrix[6][2] >= -1.600 && rollTree_rotationMatrix[6][2] <= -1.100 && // M1 FC
+                rollTree_rotationMatrix[4][2] >= -1.600 && rollTree_rotationMatrix[4][2] <= -0.700) { // I2 FC
+            return 'x';
+        } // Detects X
+
+        else {      
+            return '+';
+        } // Else not a letter we are dealing with
+    } 
     // else if () {
 
-    // } // Detects C
-    // else if () {
-
-    // } // Detects O    
+    // } // Detects C    
     else {
         return '+'; // Let "+" be the nothing detected value
     } // None of the above. No letter produced
@@ -108,13 +123,14 @@ char rollTree(const std::vector<std::vector<float>>& rollTree_rotationMatrix){ /
 
 void decisionTree(const std::vector<std::vector<float>>& decisionTree_rotationMatrix){
     wristState wristEnum = returnWristState(decisionTree_rotationMatrix);
-
+    char temp {};
     switch (wristEnum){
         case BASE:
             //std::cout << "Ello im a base placeholder\n"; // This will call a whole new function, as w1 is fucking huge
             break;
         case ROLL:
-            rollTree(decisionTree_rotationMatrix);
+            temp = rollTree(decisionTree_rotationMatrix);
+            std::cout << "We detected " << temp << "\n";
             break;
 
         case ROLL_AND_PITCH:
@@ -172,8 +188,8 @@ int main() {
             printf("Error has occured with data receiving");
         }
         if (frameCounter % 30 == 0){
-            printBoneRotation(rotations, TRACKED_BONE);
-            //decisionTree(rotations);
+            //printBoneRotation(rotations, TRACKED_BONE);
+            decisionTree(rotations);
         }
     }
 
