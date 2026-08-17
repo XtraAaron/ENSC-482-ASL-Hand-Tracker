@@ -70,12 +70,16 @@ CurlState classifyMiddle2(const float& M2_rotation) {
 }
 
 CurlState classifyPinky1(const float& P1_rotation) {
-    if (P1_rotation >= -0.700 && P1_rotation <= -0.450) return CurlState::FULL_CURL; // J
+    if (P1_rotation >= -0.700 && P1_rotation <= -0.450) return CurlState::FULL_EXTEND; // J
     else return CurlState::UNKNOWN;
 }
+// This stuff partially used, check notes on why. Much easier on full curl and extend, due to how often they used vs semi
+// Also why no yaw function.
+// Wrist is specific, so it just gets mashed into its own function anyways
 
 
 int frameCounter;
+
 
 const std::vector<std::string> BONE_NAMES = {
     "Palm", "Thumb1", "Thumb2",
@@ -148,13 +152,13 @@ char rollTree(const std::vector<std::vector<float>>& rollTree_rotationMatrix){ /
         return 'c';
     } // Detects C   
 
-    if (rollTree_rotationMatrix[3][2] >= -0.300 && rollTree_rotationMatrix[3][2] <= -0.100) { // I1 FE (Semi FE for O)
+    if (classifyIndex1(rollTree_rotationMatrix[3][2]) == CurlState::FULL_EXTEND) { // I1 FE
         if (rollTree_rotationMatrix[6][2] >= -0.950 && rollTree_rotationMatrix[6][2] <= -0.300) { // M1 semi-curl 
             return 'd';
         } // Detects D 
 
-        else if (rollTree_rotationMatrix[6][2] >= -1.600 && rollTree_rotationMatrix[6][2] <= -1.100 && // M1 FC
-                rollTree_rotationMatrix[4][2] >= -1.600 && rollTree_rotationMatrix[4][2] <= -0.700) { // I2 FC
+        else if (classifyMiddle1(rollTree_rotationMatrix[6][2]) == CurlState::FULL_CURL && // M1 FC
+                classifyIndex2(rollTree_rotationMatrix[4][2]) == CurlState::FULL_CURL) { // I2 FC
             return 'x';
         } // Detects X
 
@@ -175,13 +179,13 @@ char rollTree(const std::vector<std::vector<float>>& rollTree_rotationMatrix){ /
 char yawTree(const std::vector<std::vector<float>>& yawTree_rotationMatrix) {
     // Check M1 first (first branch)
 
-    if (yawTree_rotationMatrix[6][2] >= -0.525 && yawTree_rotationMatrix[6][2] <= -0.070) { // M1 FE (H, P)
-        if (yawTree_rotationMatrix[7][2] >= -0.550 && yawTree_rotationMatrix[7][2] <= -0.000 && // M2 FE
+    if (classifyMiddle1(yawTree_rotationMatrix[6][2]) == CurlState::FULL_EXTEND) { // M1 FE (H, P)
+        if (classifyMiddle2(yawTree_rotationMatrix[7][2]) == CurlState::FULL_EXTEND && // M2 FE
                 yawTree_rotationMatrix[6][0] >= -0.325 && yawTree_rotationMatrix[6][0] <= 0.450) { // M1 Yaw
             return 'h';
         } // H
 
-        else if (yawTree_rotationMatrix[3][2] >= -0.300 && yawTree_rotationMatrix[3][2] <= -0.100) { // I1 FE 
+        else if (classifyIndex1(yawTree_rotationMatrix[3][2]) == CurlState::FULL_EXTEND) { // I1 FE 
             return 'p'; 
         } // P
 
@@ -191,12 +195,12 @@ char yawTree(const std::vector<std::vector<float>>& yawTree_rotationMatrix) {
         
     }
 
-    else if (yawTree_rotationMatrix[6][2] >= -1.610 && yawTree_rotationMatrix[6][2] <= -0.450) { // M1 FC (G, J 10)
-        if (yawTree_rotationMatrix[12][2] >= -0.700 && yawTree_rotationMatrix[12][2] <= -0.450) { // Checks P1 (Not using P2, not needed)
+    else if (classifyMiddle1(yawTree_rotationMatrix[6][2]) == CurlState::FULL_CURL) { // M1 FC (G, J 10)
+        if (classifyPinky1(yawTree_rotationMatrix[12][2]) == CurlState::FULL_EXTEND) { // Checks P1 (Not using P2, not needed)
             return 'j';
         } // J
         
-        else if (yawTree_rotationMatrix[3][2] >= -0.500 && yawTree_rotationMatrix[3][2] <= -0.275) { // I1 FE
+        else if (classifyIndex1(yawTree_rotationMatrix[3][2]) == CurlState::FULL_EXTEND) { // I1 FE
             return 'g';
         } // G
 

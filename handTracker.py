@@ -156,7 +156,7 @@ def main():
 
             cv2.imshow("Hand Tracking", frame) # Display the frame in a seperate window
 
-            if cv2.waitKey(1) & 0xFF == ord('q'): # Wait refreshes the window, waits 1 ms and sees if a key was pressed
+            if cv2.waitKey(1) & 0xFF in (ord('q'), ord('Q')): # Wait refreshes the window, waits 1 ms and sees if q or Q was pressed
                 break
             # If q is pressed, break            
 

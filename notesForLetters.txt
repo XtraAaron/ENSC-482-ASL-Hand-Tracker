@@ -72,6 +72,8 @@ Palm
 C is a little bit finiky, would like to increase range, but it sorta overlaps onto d so i would rather leave for future improvments under "tuning"
 
 Note, Y = S, originally it was sway (S) renamed it to yaw (Y)
+Note, semi curl and semi extend not tracked since in this implimentation, they are specific to a couple symbols
+If every finger were to be tracked, it could be implimented in
 
 Rotational Values (X,Y,Z)
 Note: Under future improvments, improve this range is prob smth to put down too
