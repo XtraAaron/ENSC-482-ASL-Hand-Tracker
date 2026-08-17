@@ -19,11 +19,13 @@ enum wristState { // Enum for the wrist state, makes it ez to track
 
 // Note, the .bat file only works with g++, need smth different if not using g++
 
+#define TRACKED_BONE 14 // Goes from 0 to 14
+
 #define UDP_PORT 5053 // Output port
 #define NUM_BONES 15 // Number of bones
 #define NUM_FLOAT 45 // Would perefer double byt python packs in floats
 
-#define TRACKED_BONE 0 // Goes from 0 to 14
+
 
 int frameCounter;
 
@@ -45,39 +47,95 @@ void printBoneRotation(const std::vector<std::vector<float>>& rotations, int bon
     const auto& rotation = rotations[boneIndex];
     printf("%s rot: %.3f %.3f %.3f\n", BONE_NAMES[boneIndex].c_str(), rotation[0], rotation[1], rotation[2]);
 } // Debugging function, used to get the information for finding rotational data
+// Not at all important, just prints XYZ and respective tracked bone
 
-wristState returnWristState(const std::vector<std::vector<float>>& rotations) {
+
+wristState returnWristState(const std::vector<std::vector<float>>& returnWristState_RotationMatrix) {
     // Can't use switch due to range
     // First comparison is for min coords, second max coords
-    if (rotations[0][1] >= 0.700 && rotations[0][1] <= 2.200) { // Roll state
-        std::cout << "This is in roll state hot dog flavoured water\n\n";
+    if (returnWristState_RotationMatrix[0][1] >= 0.700 && returnWristState_RotationMatrix[0][1] <= 2.200) { // Roll state, track Y
+        //std::cout << "This is in roll state hot dog flavoured water\n\n";
         return ROLL;
     } // Roll placed at top, as it helps deal with base overlapping with its boundry sometime
-    else if (rotations[0][1] >= 2.200 && rotations[0][1] <= 3.100) { // Reverse state
-        std::cout << "This is in Reverse State state\n\n";
+    else if (returnWristState_RotationMatrix[0][1] >= 2.200 && returnWristState_RotationMatrix[0][1] <= 3.100) { // Reverse state, track Y
+        //std::cout << "This is in Reverse State state\n\n";
         return REVERSE_ROLL;
     } // Basically divide roll into 2 sections, reversed wrist and sideways
-    else if (rotations[0] >= std::vector<float>{-0.100, -0.175, -0.300} &&  
-        rotations[0] <= std::vector<float>{0.245, 0.115, 0.300}){ // Base state
-        std::cout << "This is in base state\n\n";
+    else if (returnWristState_RotationMatrix[0] >= std::vector<float>{-0.100, -0.175, -0.300} &&  
+        returnWristState_RotationMatrix[0] <= std::vector<float>{0.245, 0.115, 0.300}){ // Base state
+        //std::cout << "This is in base state\n\n";
         return BASE;
     }
-    else if (rotations[0][0] >= 0.600 && rotations[0][0] <= 1.00 &&
-            rotations[0][1] >= -2.000 && rotations[0][1] <= -1.000 &&
-            rotations[0][2] >= -0.500 && rotations[0][2] <= 0.100) { // Roll and pitch state
-        std::cout << "This is in roll and pitch state\n\n";
+    else if (returnWristState_RotationMatrix[0][0] >= 0.600 && returnWristState_RotationMatrix[0][0] <= 1.00 && // Track everything individually to remove overlap
+             returnWristState_RotationMatrix[0][1] >= -2.000 && returnWristState_RotationMatrix[0][1] <= -1.000 &&
+             returnWristState_RotationMatrix[0][2] >= -0.500 && returnWristState_RotationMatrix[0][2] <= 0.100) { // Roll and pitch state
+        //std::cout << "This is in roll and pitch state\n\n";
         return ROLL_AND_PITCH;
     } // Put roll and pitch b4 yaw since yaw is more general, filter out the more specilized state first
-    else if (rotations[0][0] >= -0.050 && rotations[0][0] <= 1.250) { // Yaw state
-        std::cout << "This is in yaw state\n\n";
+    else if (returnWristState_RotationMatrix[0][0] >= -0.050 && returnWristState_RotationMatrix[0][0] <= 1.250) { // Yaw state, track X
+        //std::cout << "This is in yaw state\n\n";
         return YAW;
     }
     else {
-        std::cout << "Current state is unknown\n\n";
+        //std::cout << "Current state is unknown\n\n";
         return UNKNOWN;
     }     
 } // This function is the first stage of the tree, determine what kinda of movment is being undertaken
 // All bounds were found manually, more tuning could be done to get better results. For now should be good enough
+
+
+char rollTree(const std::vector<std::vector<float>>& rollTree_rotationMatrix){ // ω2 
+    // Star with I1
+    if (rollTree_rotationMatrix[3][2] >= -0.225 && rollTree_rotationMatrix[3][2] <= -0.150) { // I1 FE
+        std::cout << "Full extendion detection good\n";
+        return 'x';
+    } // Detects D or X 
+    // Check i2 full curl for x and M1 semi-curl for D
+    // else if () {
+
+    // } // Detects C
+    // else if () {
+
+    // } // Detects O    
+    else {
+        return '+'; // Let "+" be the nothing detected value
+    } // None of the above. No letter produced
+    return 'c';
+}
+// Needs M1, I1, I2
+// C and O are the only "partial" curls used in the tree
+
+
+void decisionTree(const std::vector<std::vector<float>>& decisionTree_rotationMatrix){
+    wristState wristEnum = returnWristState(decisionTree_rotationMatrix);
+
+    switch (wristEnum){
+        case BASE:
+            //std::cout << "Ello im a base placeholder\n"; // This will call a whole new function, as w1 is fucking huge
+            break;
+        case ROLL:
+            rollTree(decisionTree_rotationMatrix);
+            break;
+
+        case ROLL_AND_PITCH:
+            std::cout << "Ello im a roelplay placeholder\n";
+            break;
+
+        case YAW:
+            std::cout << "Ello im a yaw placeholder\n";
+            break;
+
+        case REVERSE_ROLL:
+            std::cout << "Ello im a reverse placeholder\n";
+            break;
+
+        case UNKNOWN:
+            break;
+        default:
+            std::cout << "An error has occured in the wrist state";
+            break;
+    }
+} // This is the decision tree function that calls all the other crap
 
 
 int main() {
@@ -115,7 +173,7 @@ int main() {
         }
         if (frameCounter % 30 == 0){
             printBoneRotation(rotations, TRACKED_BONE);
-            returnWristState(rotations);
+            //decisionTree(rotations);
         }
     }
 
