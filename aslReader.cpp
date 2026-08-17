@@ -143,11 +143,6 @@ char rollTree(const std::vector<std::vector<float>>& rollTree_rotationMatrix){ /
 char yawTree(const std::vector<std::vector<float>>& yawTree_rotationMatrix) {
     // Check M1 first (first branch)
 
-    std::cout
-    << " T1 X: " << yawTree_rotationMatrix[1][0]
-    << " T1 z: " << yawTree_rotationMatrix[1][2]
-    << "\n"; // Debug stuff
-
     if (yawTree_rotationMatrix[6][2] >= -0.525 && yawTree_rotationMatrix[6][2] <= -0.070) { // M1 FE (H, P)
         if (yawTree_rotationMatrix[7][2] >= -0.550 && yawTree_rotationMatrix[7][2] <= -0.000 && // M2 FE
                 yawTree_rotationMatrix[6][0] >= -0.325 && yawTree_rotationMatrix[6][0] <= 0.450) { // I1 Yaw
@@ -189,6 +184,15 @@ char yawTree(const std::vector<std::vector<float>>& yawTree_rotationMatrix) {
 // Add J to use M1 too (FC)
 
 
+char reverseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatrix) {
+    std::cout
+    << " T1 X: " << reverseTree_rotationMatrix[1][0]
+    << " T1 z: " << reverseTree_rotationMatrix[1][2]
+    << "\n"; // Debug stuff  
+    return '|'  ;
+}
+
+
 void decisionTree(const std::vector<std::vector<float>>& decisionTree_rotationMatrix){
     wristState wristEnum = returnWristState(decisionTree_rotationMatrix);
     char temp {};
@@ -213,11 +217,12 @@ void decisionTree(const std::vector<std::vector<float>>& decisionTree_rotationMa
             break;
 
         case REVERSE_ROLL:
-            std::cout << "Ello im a reverse placeholder\n";
+            temp = reverseTree(decisionTree_rotationMatrix);
+            std::cout << "We detected " << temp << "\n"; // Debug
             break;
 
         case UNKNOWN:
-            std::cout << "Galunga\n";
+            std::cout << "Unknown Value\n";
             break;
         default:
             std::cout << "An error has occured in the wrist state";
