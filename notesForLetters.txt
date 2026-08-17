@@ -88,6 +88,7 @@ Palm
 
 Thumb1
     This one needs to be specific for the particular ones i think
+    10: (-0.807572 - -0.467312, 0.000, -0.186647 - 0.183533)
 
 
 Thumb2

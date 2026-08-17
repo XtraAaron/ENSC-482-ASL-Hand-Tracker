@@ -52,6 +52,8 @@ Need to run pip install OneEuroFilter
 
 Capitals are impossible, so no.
 
+Due to how its implimented, 10 is represented as a 0. Its still 10, not 0
+
 Current bugs: Minor
     1. Wrist bending down appears to cause some rotation, might be hand itself together
     2. Wrist bending down causes fingers to bend

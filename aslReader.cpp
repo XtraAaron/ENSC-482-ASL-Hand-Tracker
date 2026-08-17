@@ -144,8 +144,8 @@ char yawTree(const std::vector<std::vector<float>>& yawTree_rotationMatrix) {
     // Check M1 first (first branch)
 
     std::cout
-    << " I1 z: " << yawTree_rotationMatrix[3][2]
-    << " P1 z: " << yawTree_rotationMatrix[12][2]
+    << " T1 X: " << yawTree_rotationMatrix[1][0]
+    << " T1 z: " << yawTree_rotationMatrix[1][2]
     << "\n"; // Debug stuff
 
     if (yawTree_rotationMatrix[6][2] >= -0.525 && yawTree_rotationMatrix[6][2] <= -0.070) { // M1 FE (H, P)
@@ -173,9 +173,9 @@ char yawTree(const std::vector<std::vector<float>>& yawTree_rotationMatrix) {
             return 'g';
         } // G
 
-        // else if () { // Thumb POS
-        //     return '0';
-        // }
+        else if (yawTree_rotationMatrix[1][0] >= -0.825 && yawTree_rotationMatrix[1][0] <= -0.425 ) { // Thump Pos X
+            return '0'; // Technically should be 10, but yea its becoming represented by a 0
+        } // 10
             
         else {
             return '-';
