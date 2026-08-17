@@ -3,6 +3,15 @@
 #include <cstdio> // Using printf not cout for this one
 #include <vector> // Vector cuz i dont like arrays
 #include <string> // String
+#include <iostream>
+
+enum wristState { // Enum for the wrist state, makes it ez to track
+    BASE, // Base state
+    ROLL, // Roll state
+    ROLL_AND_PITCH, // RP state
+    YAW, // Yaw state
+    UNKNOWN // We dont know what state its in rn, if its this dont do anything
+};
 
 #pragma comment(lib, "Ws2_32.lib") // Autolink Winsock if using MSVC
 // Not needed if runing g++ tho
@@ -36,14 +45,34 @@ void printBoneRotation(const std::vector<std::vector<float>>& rotations, int bon
     printf("%s rot: %.3f %.3f %.3f\n", BONE_NAMES[boneIndex].c_str(), rotation[0], rotation[1], rotation[2]);
 } // Debugging function, used to get the information for finding rotational data
 
-int returnWristState(const std::vector<std::vector<float>>& rotations) {
+wristState returnWristState(const std::vector<std::vector<float>>& rotations) {
     // Can't use switch due to range
-    if (rotations[0] <=){
-
+    // First comparison is for min coords, second max coords
+    if (rotations[0] >= std::vector<float>{0.215, 0.700, 0.035} &&
+        rotations[0] <= std::vector<float>{0.420, 2.100, 0.215}){ // Roll state
+        std::cout << "This is in roll state hot dog flavoured water\n\n";
+        return ROLL;
+    } // Roll placed at top, as it helps deal with base overlapping with its boundry sometime
+    // Now roll take priority
+    else if (rotations[0] >= std::vector<float>{-0.100, -0.175, -0.300} &&  
+        rotations[0] <= std::vector<float>{0.245, 0.115, 0.300}){ // Base state
+        std::cout << "This is in base state\n\n";
+        return BASE;
     }
-    else if (){
-
-    }
+    else if (rotations[0] >= std::vector<float>{-0.050, -0.195, -0.005} &&
+        rotations[0] <= std::vector<float>{1.250, 0.075, 0.235}){ // Yaw state
+        std::cout << "This is in yaw state\n\n";
+        return YAW;
+    }    
+    else if (rotations[0] >= std::vector<float>{0.705, -1.900, -0.400} &&
+        rotations[0] <= std::vector<float>{0.975, -1.300, 0.005}){ // Roll and pitch state
+        std::cout << "This is in roll and pitch state\n\n";
+        return ROLL_AND_PITCH;
+    } // Roll and pitch lowest priority cuz Q is a single letter, and its finiky with the current code
+    else {
+        std::cout << "Current state is unknown\n\n";
+        return UNKNOWN;
+    }     
 } // This function is the first stage of the tree, determine what kinda of movment is being undertaken
 // All bounds were found manually, more tuning could be done to get better results. For now should be good enough
 
@@ -64,9 +93,9 @@ int main() {
     std::vector<float> buffer(NUM_FLOAT); // Buffer for the rotational data
 
     while (true) {
+        frameCounter++;
         std::vector<std::vector<float>> rotations{}; // 2D vector to actually hold the data
         int bytesReceived = recvfrom(sock, (char*)buffer.data(), buffer.size() * sizeof(float), 0, nullptr, nullptr); 
-        frameCounter++;
         // Block until package recieved, then copy raw info into buffer
         for (int i{}; i < NUM_FLOAT; i+=3){
             float tempX = buffer[i];
@@ -83,6 +112,7 @@ int main() {
         }
         if (frameCounter % 30 == 0){
             printBoneRotation(rotations, TRACKED_BONE);
+            returnWristState(rotations);
         }
     }
 
