@@ -144,8 +144,8 @@ char yawTree(const std::vector<std::vector<float>>& yawTree_rotationMatrix) {
     // Check M1 first (first branch)
 
     std::cout
-    << " I1 x: " << yawTree_rotationMatrix[3][0]
-    //<< " M1 z: " << yawTree_rotationMatrix[6][2]
+    << " I1 z: " << yawTree_rotationMatrix[3][2]
+    << " P1 z: " << yawTree_rotationMatrix[12][2]
     << "\n"; // Debug stuff
 
     if (yawTree_rotationMatrix[6][2] >= -0.525 && yawTree_rotationMatrix[6][2] <= -0.070) { // M1 FE (H, P)
@@ -165,10 +165,24 @@ char yawTree(const std::vector<std::vector<float>>& yawTree_rotationMatrix) {
     }
 
     else if (yawTree_rotationMatrix[6][2] >= -1.610 && yawTree_rotationMatrix[6][2] <= -0.450) { // M1 FC (G, J 10)
-        std::cout << "Yummers this is curling real good\n";
+        if (yawTree_rotationMatrix[12][2] >= -0.700 && yawTree_rotationMatrix[12][2] <= -0.450) { // Checks P1 (Not using P2, not needed)
+            return 'j';
+        } // J
+        
+        else if (yawTree_rotationMatrix[3][2] >= -0.500 && yawTree_rotationMatrix[3][2] <= -0.275) { // I1 FE
+            return 'g';
+        } // G
+
+        // else if () { // Thumb POS
+        //     return '0';
+        // }
+            
+        else {
+            return '-';
+        } // Unknown letter
     }
 
-    return '-';
+    return '|';
 } // G H J P 10
 // Uses I1 M1 M2 P1 P2
 // Check J last, cuz it only checks pinky
