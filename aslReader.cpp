@@ -36,6 +36,17 @@ void printBoneRotation(const std::vector<std::vector<float>>& rotations, int bon
     printf("%s rot: %.3f %.3f %.3f\n", BONE_NAMES[boneIndex].c_str(), rotation[0], rotation[1], rotation[2]);
 } // Debugging function, used to get the information for finding rotational data
 
+int returnWristState(const std::vector<std::vector<float>>& rotations) {
+    // Can't use switch due to range
+    if (rotations[0] <=){
+
+    }
+    else if (){
+
+    }
+} // This function is the first stage of the tree, determine what kinda of movment is being undertaken
+// All bounds were found manually, more tuning could be done to get better results. For now should be good enough
+
 
 int main() {
     WSADATA wsaData; // Winsock fills this with version and implimntation info, needed by API as seen below

@@ -2,7 +2,9 @@ Palm
     Base: B
     Roll: R (For letters such as C or D)
     Roll and Pitch: RP
-    Sway: S (Always in 1 direction)
+    Yaw: Y (Always in 1 direction)
+
+Thumb1 on more of a case by case basis due to opposible nature
 
 Tree format
     Start with Wrist as general classification
@@ -31,16 +33,16 @@ C - R
 D - R
 E - B
 F - B
-G - S
-H - S
+G - Y
+H - Y
 I - B
-J - S
+J - Y
 K - B
 L - B
 M - B
 N - B
 O - R
-P - S
+P - Y
 Q - RP
 R - B
 S - B
@@ -52,13 +54,24 @@ X - R
 Y - B
 Z - B
 
+Note, Y = S, originally it was sway (S) renamed it to yaw (Y)
 
 Rotational Values (X,Y,Z)
 Note: Under future improvments, improve this range is prob smth to put down too
 
 Palm
-    Base: (0.024 - 0.241, -0.175 - 0.112, -0.065 - 0.299)
-    Roll in: (0. - 0., -0. - 0., -0. - 0.)
-    Roll out: (0. - 0., -0. - 0., -0. - 0.)
-    Roll and Pitch: (0. - 0., -0. - 0., -0. - 0.)
-    Sway (Need to add, ignored for now)
+    Base:           (0.024 - 0.241, -0.175 -  0.112, -0.065 - 0.299)
+    Roll:           (0.215 - 0.417,  0.799 -  2.097,  0.038 - 0.213)
+    Roll and Pitch: (0.707 - 0.973, -1.902 - -1.296, -0.400 - 0.002)
+    Yaw:            (0.683 - 0.922, -0.045 -  0.075,  0.165 - 0.222)
+
+Thumb1
+Thumb2
+Index1
+Index2
+Middle1
+Middle2
+Ring1
+Ring2
+Pinky1
+Pinky3
