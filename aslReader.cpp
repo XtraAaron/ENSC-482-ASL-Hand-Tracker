@@ -14,6 +14,12 @@ enum wristState { // Enum for the wrist state, makes it ez to track
     UNKNOWN // We dont know what state its in rn, if its this dont do anything
 };
 
+enum class CurlState {
+    FULL_CURL,
+    FULL_EXTEND,
+    UNKNOWN };
+// Future improvment for sure, is that ideally we would have a function perform classification
+
 #pragma comment(lib, "Ws2_32.lib") // Autolink Winsock if using MSVC
 // Not needed if runing g++ tho
 
@@ -41,6 +47,32 @@ Pinky3	14
 #define NUM_BONES 15 // Number of bones
 #define NUM_FLOAT 45 // Would perefer double byt python packs in floats
 
+
+CurlState classifyIndex1(const float& I1_rotation) {
+    if (I1_rotation >= -0.500 && I1_rotation <= -0.100) return CurlState::FULL_EXTEND; 
+    else return CurlState::UNKNOWN;
+}
+
+CurlState classifyIndex2(const float& I2_rotation) {
+    if (I2_rotation >= -1.600 && I2_rotation <= -0.700) return CurlState::FULL_CURL; // X (I2 FC)
+    else return CurlState::UNKNOWN;
+}
+
+CurlState classifyMiddle1(const float& M1_rotation) {
+    if (M1_rotation >= -0.525 && M1_rotation <= -0.070) return CurlState::FULL_EXTEND; // H/P gate
+    else if (M1_rotation >= -1.610 && M1_rotation <= -0.450) return CurlState::FULL_CURL; // G/J/10 gate -- overlaps prior FULL_CURL range, keep this order
+    else return CurlState::UNKNOWN;
+}
+
+CurlState classifyMiddle2(const float& M2_rotation) {
+    if (M2_rotation >= -0.550 && M2_rotation <= -0.000) return CurlState::FULL_EXTEND; // H
+    else return CurlState::UNKNOWN;
+}
+
+CurlState classifyPinky1(const float& P1_rotation) {
+    if (P1_rotation >= -0.700 && P1_rotation <= -0.450) return CurlState::FULL_CURL; // J
+    else return CurlState::UNKNOWN;
+}
 
 
 int frameCounter;
@@ -107,7 +139,7 @@ char rollTree(const std::vector<std::vector<float>>& rollTree_rotationMatrix){ /
                 // << " M1: " << rollTree_rotationMatrix[6][2]
                 // //<< " I2: " << rollTree_rotationMatrix[4][2] 
                 // << "\n";      // Debug stuff
-    if (rollTree_rotationMatrix[3][2] >= -1.000 && rollTree_rotationMatrix[3][2] <= -0.700) {
+    if (rollTree_rotationMatrix[3][2] >= -1.000 && rollTree_rotationMatrix[3][2] <= -0.700) { // I1 semi-curl;
         return 'o'; 
     } // Detect O     
 
@@ -145,7 +177,7 @@ char yawTree(const std::vector<std::vector<float>>& yawTree_rotationMatrix) {
 
     if (yawTree_rotationMatrix[6][2] >= -0.525 && yawTree_rotationMatrix[6][2] <= -0.070) { // M1 FE (H, P)
         if (yawTree_rotationMatrix[7][2] >= -0.550 && yawTree_rotationMatrix[7][2] <= -0.000 && // M2 FE
-                yawTree_rotationMatrix[6][0] >= -0.325 && yawTree_rotationMatrix[6][0] <= 0.450) { // I1 Yaw
+                yawTree_rotationMatrix[6][0] >= -0.325 && yawTree_rotationMatrix[6][0] <= 0.450) { // M1 Yaw
             return 'h';
         } // H
 

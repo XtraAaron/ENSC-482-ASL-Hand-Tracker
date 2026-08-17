@@ -31,6 +31,10 @@ Fix Q, issue may be with motion of the hand tho. - Q is fucked, idgaf
 
 Future work could include adding more sign language libraries, adding movment of the hand itself, and the different ASl versions
 
+Future improvment for sure, is that ideally we would have a function perform classification
+Couldn't do here, as many tuning functions overlap. It is not a continuous distinct set of values, 
+rather due to the nature of the rotations a lot of things overlap, so thus are specific to the function itself.
+
 C recalibrates
 Always run code with hand in rest position (like high five)
 
