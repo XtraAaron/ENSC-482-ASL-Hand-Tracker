@@ -43,31 +43,33 @@ Numbers
 
 Palm 
     A - B   
-    B - B
-    C - R
-    D - R
-    E - B
-    F - B
-    G - Y
-    H - Y
-    I - B
-    J - Y
-    K - B
-    L - B
-    M - B
-    N - B
-    O - R
-    P - Y
-    Q - RP
-    R - B
-    S - B
-    T - B
-    U - B
-    V - B
-    W - B
-    X - R
-    Y - B
-    Z - B
+    B - B   
+    C - R   DONE
+    D - R   DONE
+    E - B   
+    F - B   
+    G - Y   
+    H - Y   
+    I - B   
+    J - Y   
+    K - B   
+    L - B   
+    M - B   
+    N - B   
+    O - R   DONE
+    P - Y   
+    Q - RP  
+    R - B   
+    S - B   
+    T - B   
+    U - B   
+    V - B   
+    W - B   
+    X - R   DONE
+    Y - B   
+    Z - B   
+
+C is a little bit finiky, would like to increase range, but it sorta overlaps onto d so i would rather leave for future improvments under "tuning"
 
 Note, Y = S, originally it was sway (S) renamed it to yaw (Y)
 

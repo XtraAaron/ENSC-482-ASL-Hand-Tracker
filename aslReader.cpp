@@ -21,6 +21,21 @@ enum wristState { // Enum for the wrist state, makes it ez to track
 
 #define TRACKED_BONE 14 // Goes from 0 to 14
 
+/*
+Bone	Index
+Palm	0
+Thumb1	1
+Thumb2	2
+Index1	3
+Index2	4
+Middle1	6
+Middle2	7
+Ring1	9
+Ring2	10
+Pinky1	12
+Pinky3	14
+*/
+
 #define UDP_PORT 5053 // Output port
 #define NUM_BONES 15 // Number of bones
 #define NUM_FLOAT 45 // Would perefer double byt python packs in floats
@@ -88,12 +103,17 @@ char rollTree(const std::vector<std::vector<float>>& rollTree_rotationMatrix){ /
     // Star with I1
                 std::cout
                 << " I1: " << rollTree_rotationMatrix[3][2]
-                //<< " M1: " << rollTree_rotationMatrix[6][2]
+                << " M1: " << rollTree_rotationMatrix[6][2]
                 //<< " I2: " << rollTree_rotationMatrix[4][2] 
                 << "\n";      
     if (rollTree_rotationMatrix[3][2] >= -1.000 && rollTree_rotationMatrix[3][2] <= -0.700) {
         return 'o'; 
     } // Detect O     
+
+    else if (rollTree_rotationMatrix[3][2] >=  -0.250 && rollTree_rotationMatrix[3][2] <= -0.050 && // I1 semi-extend
+            rollTree_rotationMatrix[6][2] >= -0.180 && rollTree_rotationMatrix[6][2] <= -0.000) { // M1 semi-extend
+        return 'c';
+    } // Detects C   
 
     if (rollTree_rotationMatrix[3][2] >= -0.300 && rollTree_rotationMatrix[3][2] <= -0.100) { // I1 FE (Semi FE for O)
         if (rollTree_rotationMatrix[6][2] >= -0.950 && rollTree_rotationMatrix[6][2] <= -0.300) { // M1 semi-curl 
@@ -108,10 +128,7 @@ char rollTree(const std::vector<std::vector<float>>& rollTree_rotationMatrix){ /
         else {      
             return '+';
         } // Else not a letter we are dealing with
-    } 
-    // else if () {
-
-    // } // Detects C    
+    }  
     else {
         return '+'; // Let "+" be the nothing detected value
     } // None of the above. No letter produced
