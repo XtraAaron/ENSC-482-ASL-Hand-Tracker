@@ -144,21 +144,24 @@ char yawTree(const std::vector<std::vector<float>>& yawTree_rotationMatrix) {
     // Check M1 first (first branch)
 
     std::cout
-    << " M1: " << yawTree_rotationMatrix[6][2]
+    << " I1 x: " << yawTree_rotationMatrix[3][0]
+    //<< " M1 z: " << yawTree_rotationMatrix[6][2]
     << "\n"; // Debug stuff
 
-    if (yawTree_rotationMatrix[6][2] >= -0.300 && yawTree_rotationMatrix[6][2] <= -0.070) { // M1 FE (H, P)
-        if (yawTree_rotationMatrix[3][2] >= -0.300 && yawTree_rotationMatrix[3][2] <= -0.100) { // I1 FE
-            return 'h'; 
-        } // H 
+    if (yawTree_rotationMatrix[6][2] >= -0.525 && yawTree_rotationMatrix[6][2] <= -0.070) { // M1 FE (H, P)
+        if (yawTree_rotationMatrix[7][2] >= -0.550 && yawTree_rotationMatrix[7][2] <= -0.000 && // M2 FE
+                yawTree_rotationMatrix[6][0] >= -0.325 && yawTree_rotationMatrix[6][0] <= 0.450) { // I1 Yaw
+            return 'h';
+        } // H
 
-        else if (yawTree_rotationMatrix[7][2] >= -0.550 && yawTree_rotationMatrix[7][2] <= -0.000) { // M2 FE
-            return 'p';
+        else if (yawTree_rotationMatrix[3][2] >= -0.300 && yawTree_rotationMatrix[3][2] <= -0.100) { // I1 FE 
+            return 'p'; 
         } // P
 
         else {
             return '+';
         } // Not H or P
+        
     }
 
     else if (yawTree_rotationMatrix[6][2] >= -1.610 && yawTree_rotationMatrix[6][2] <= -0.450) { // M1 FC (G, J 10)

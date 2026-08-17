@@ -49,7 +49,7 @@ Palm
     E - B   
     F - B   
     G - Y   
-    H - Y   DONE
+    H - Y   DONE (Bit of overlap with P still)
     I - B   
     J - Y   
     K - B   
@@ -57,7 +57,7 @@ Palm
     M - B   
     N - B   
     O - R   DONE
-    P - Y   
+    P - Y   DONE (Note: A bit weird, just exaggerate spread more and it helps detect)
     Q - RP  - Sometimes works, still not very good
     R - B   
     S - B   
