@@ -52,12 +52,19 @@ Pinky3	14
 // All bounds hand tuned
 CurlState classifyIndex1(const float& I1_rotation) {
     if (I1_rotation >= -0.500 && I1_rotation <= -0.100) return CurlState::FULL_EXTEND; // Full extend state
-    if (I1_rotation >= -1.610 && I1_rotation <= 0.525) return CurlState::FULL_CURL;
+    else if (I1_rotation >= -1.610 && I1_rotation <= 0.525) return CurlState::FULL_CURL;
     else return CurlState::UNKNOWN; // Unknown state
 }
 
 CurlState classifyIndex2(const float& I2_rotation) {
-    if (I2_rotation >= -1.600 && I2_rotation <= -0.700) return CurlState::FULL_CURL; // Full curl state
+    if (I2_rotation >= -1.600 && I2_rotation <= -0.750) return CurlState::FULL_CURL; // Full curl state
+    else if (I2_rotation >= -0.725 && I2_rotation <= 0.000) return CurlState::FULL_EXTEND; // Full curl state
+    else return CurlState::UNKNOWN;
+}
+
+CurlState classifyIndex3(const float& I3_rotation) {
+    if (I3_rotation >= -1.600 && I3_rotation <= -0.700) return CurlState::FULL_CURL; // Full curl state
+    else if (I3_rotation >= -0.675 && I3_rotation <= 0.000) return CurlState::FULL_EXTEND; // Full curl state
     else return CurlState::UNKNOWN;
 }
 
@@ -69,6 +76,7 @@ CurlState classifyMiddle1(const float& M1_rotation) {
 
 CurlState classifyMiddle2(const float& M2_rotation) {
     if (M2_rotation >= -0.550 && M2_rotation <= -0.000) return CurlState::FULL_EXTEND; 
+    else if (M2_rotation >= -1.610 && M2_rotation <= -0.550) return CurlState::FULL_EXTEND; 
     else return CurlState::UNKNOWN;
 }
 
@@ -77,16 +85,21 @@ CurlState classifyRing1(const float& R1_rotation) {
     else if (R1_rotation >= -1.610 && R1_rotation <= -0.525) return CurlState::FULL_CURL; // Not measured by hand, if needed change this
     else return CurlState::UNKNOWN;
 }
+CurlState classifyRing2(const float& R2_rotation) {
+    if (R2_rotation >= -0.475 && R2_rotation <= -0.075) return CurlState::FULL_EXTEND; // Not measured by hand, if needed change this
+    else if (R2_rotation >= -1.610 && R2_rotation <= -0.525) return CurlState::FULL_CURL; // Not measured by hand, if needed change this
+    else return CurlState::UNKNOWN;
+}
 
 CurlState classifyPinky1(const float& P1_rotation) {
-    if (P1_rotation >= -0.700 && P1_rotation <= -0.450) return CurlState::FULL_EXTEND; 
-    //else if (P1_rotation >= -1.610 && P1_rotation <= -0.500) return CurlState::FULL_CURL; // Not measured by hand, if needed change this
+    if (P1_rotation >= -0.700 && P1_rotation <= -0.150) return CurlState::FULL_EXTEND; 
+    else if (P1_rotation >= -1.610 && P1_rotation <= -0.710) return CurlState::FULL_CURL; // Not measured by hand, if needed change this
     else return CurlState::UNKNOWN;
 }
 
 CurlState classifyPinky3(const float& P3_rotation) {
-    if (P3_rotation >= -0.225 && P3_rotation <= -0.000) return CurlState::FULL_EXTEND; 
-    else if (P3_rotation >= -1.610 && P3_rotation <= -0.850) return CurlState::FULL_CURL; // Not measured by hand, if needed change this
+    if (P3_rotation >= -0.425 && P3_rotation <= -0.000) return CurlState::FULL_EXTEND; 
+    else if (P3_rotation >= -1.610 && P3_rotation <= -0.650) return CurlState::FULL_CURL; // Not measured by hand, if needed change this
     else return CurlState::UNKNOWN;
 }
 // This stuff partially used, check notes on why. Much easier on full curl and extend, due to how often they used vs semi
@@ -131,9 +144,9 @@ wristState returnWristState(const std::vector<std::vector<float>>& returnWristSt
         //std::cout << "This is in Reverse State state\n\n";
         return REVERSE_ROLL;
     } // Basically divide roll into 2 sections, reversed wrist and sideways
-    else if (returnWristState_RotationMatrix[0][0] >= -0.350 && returnWristState_RotationMatrix[0][0] <= 0.325 && // X
-             returnWristState_RotationMatrix[0][1] >= -0.500 && returnWristState_RotationMatrix[0][1] <= 0.500 && // Y
-             returnWristState_RotationMatrix[0][2] >= -0.500 && returnWristState_RotationMatrix[0][2] <= 0.500) { // Z
+    else if (returnWristState_RotationMatrix[0][0] >= -0.450 && returnWristState_RotationMatrix[0][0] <= 0.450 && // X
+             returnWristState_RotationMatrix[0][1] >= -0.575 && returnWristState_RotationMatrix[0][1] <= 0.575 && // Y
+             returnWristState_RotationMatrix[0][2] >= -0.575 && returnWristState_RotationMatrix[0][2] <= 0.575) { // Z
         //std::cout << "This is in base state\n\n";
         return BASE; // Base state
     }
@@ -293,28 +306,190 @@ char reverseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatr
 
 // Depth of 5 total
 
+char baseTreeD4(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix, int combinedResult) {
+    // std::cout
+    // << " T1 X: " << baseTreeD3_rotationMatrix3[1][0]
+    // << " T1 Z: " << baseTreeD3_rotationMatrix3[1][2]
+    // << "\n"; // Debug stuff     
+    //std::cout << "T1 " << baseTreeD4_rotationMatrix[1][0] << '\n';
+    switch (combinedResult){
+        case 1: // I1 FE, R1 FE, P1 FE
+        // B E F 7 8
+        std::cout << "Case 1\n";
+        //std::cout << "I2 rot: " << baseTreeD4_rotationMatrix[4][2] << '\n';
+            if (classifyIndex2(baseTreeD4_rotationMatrix[4][2]) == CurlState::FULL_EXTEND) { // I2 FE
+                //std::cout << "I1 FE, R1 FE, P1 FE, B 7 8\n";
+                return '@';
+            } // B 7 8
+
+            else if (classifyIndex2(baseTreeD4_rotationMatrix[4][2]) == CurlState::FULL_CURL) { // I2 FC
+                //std::cout << "I1 FE, R1 FE, P1 FE, E F\n";
+                return '@';
+            } // E F
+
+            else { // Unknown
+                return '#';
+            }
+
+            break;
+
+        case 2: // I1 FE, R1 FE, P1 FC
+        // R W
+        std::cout << "Case 2\n";        
+            if (classifyRing2(baseTreeD4_rotationMatrix[10][2]) == CurlState::FULL_EXTEND) { // R2 FE
+                //std::cout << "I1 FE, R1 FE, P1 FC, W\n";
+                return 'w';
+            } // W or 6
+
+            // else if (classifyRing2(baseTreeD4_rotationMatrix[10][2]) == CurlState::FULL_CURL) { // R2 FC
+            //     std::cout << "I1 FE, R1 FE, P1 FC, R\n";
+            //     return '@';
+            // } // R
+
+            // R overlapped with case 4 so moving it there
+
+            else { // Unknown
+                return '#';
+            }
+
+            break;
+
+        case 3: // I1 FE, F1 FC, M1 FC
+        // L Z
+        // Reuse x curl for z
+        std::cout << "Case 3\n";  
+        //std::cout << "I3 rot: " << baseTreeD4_rotationMatrix[5][2] << '\n';
+            if (classifyIndex3(baseTreeD4_rotationMatrix[5][2]) == CurlState::FULL_CURL) { // I3 FC
+                //std::cout << "I1 FE, F1 FC, M1 FC, Z\n";
+                return 'z';
+            } // Z
+
+            else if (classifyIndex3(baseTreeD4_rotationMatrix[5][2]) == CurlState::FULL_EXTEND) { //I2 FE
+                //std::cout << "I1 FE, F1 FC, M1 FC, L\n";
+                return 'l';
+            } // L
+
+            else { // Unknown
+                return '#';
+            }
+                        
+            break;
+
+        case 4: // I1 FE, F1 FC, M1 FE
+        // K U V
+        std::cout << "Case 4\n";  
+            if (true) { // I1 Spread
+                std::cout << "I1 FE, F1 FC, M1 FE, K V\n";
+                return '@';
+            } // K V
+
+            else if (classifyRing2(baseTreeD4_rotationMatrix[10][2]) == CurlState::FULL_CURL) { // R2 FC
+                std::cout << "I1 FE, R1 FE, P1 FC, R\n";
+                return 'r';
+            } // R
+
+            else if (true) { // I1 No Spread
+                std::cout << "I1 FE, F1 FC, M1 FE, U\n";
+                return 'u';
+            } // U
+
+            else { // Unknown
+                return '#';
+            }
+                        
+            break;
+
+        case 5: // I1 FC, P3 FC, T1
+        // N T
+        //std::cout << "Case 5\n";  
+        //std::cout << "T2 rot" << baseTreeD4_rotationMatrix[2][0] << '\n';
+            if (baseTreeD4_rotationMatrix[2][0] >= 0.000 && baseTreeD4_rotationMatrix[2][0] <= 0.500) { // T2 FE
+                //std::cout << "I1 FC, P3 FC, T1, A\n";
+                return 'a';
+            } // A
+
+            else if (baseTreeD4_rotationMatrix[2][0] >= 0.500 && baseTreeD4_rotationMatrix[2][0] <= 1.610) { // T2 FC
+                //std::cout << "I1 FC, P3 FC, T1, S\n";
+                return 's';
+            } // S
+
+            else { // Unknown
+                return '#';
+            }            
+                        
+            break;
+
+        case 6: // I1 FC, P3 FC, T1
+        // T N
+        //std::cout << "T1 " << baseTreeD4_rotationMatrix[1][0] << '\n';
+        std::cout << "Case 6\n";  
+            if (baseTreeD4_rotationMatrix[1][0] >= 0.200 && baseTreeD4_rotationMatrix[1][0] <= 0.450) { // I3 FE
+                //std::cout << "I1 FC, P3 FC, T1, T\n";
+                return 't';
+            } // T
+
+            else if (baseTreeD4_rotationMatrix[1][0] >= 0.500 && baseTreeD4_rotationMatrix[1][0] <= 1.000) { // I3 FC
+                //std::cout << "I1 FC, P3 FC, T1, N\n";
+                return 'n';
+            } // N
+            else { // Unknown
+                return '#';
+            }
+                        
+            break;
+
+// Fix case 5 6 overlap
+
+        case 7: // I1 FC, P3 FE, P1 FE
+        // I Y
+        // Need custom thumb
+        std::cout << "Case 7\n";  
+            if (true) {
+                std::cout << "I1 FC, P3 FE, P1 FE, Y\n";
+                return 'i';
+            } // I
+
+            else if (true) {
+                std::cout << "I1 FC, P3 FE, P1 FE, Y\n";
+                return 'y';
+            } // Y
+
+            else { // Unknown
+                return '#';
+            }
+                        
+            break;
+        default:
+            return '$';
+            break;            
+    }
+
+}
+
 char baseTreeD3(const std::vector<std::vector<float>>& baseTreeD3_rotationMatrix3, int combinedResult) { // combinedResult up to 8
     // Used an int to continue using switch, much nicer than ifs
 
-    std::cout
-    << " T1 X: " << baseTreeD3_rotationMatrix3[1][0]
-    << " T1 Z: " << baseTreeD3_rotationMatrix3[1][2]
-    << "\n"; // Debug stuff 
+    // std::cout
+    // << " T1 X: " << baseTreeD3_rotationMatrix3[1][0]
+    // << " T1 Z: " << baseTreeD3_rotationMatrix3[1][2]
+    // << "\n"; // Debug stuff 
 
     switch (combinedResult){
         case 1: // I1 FE, R1 FE
             // B E F R W
             if (classifyPinky1(baseTreeD3_rotationMatrix3[12][2]) == CurlState::FULL_EXTEND) { // P1 FE
-                std::cout << "I1 FE, R1 FE, P1 FE\n";
-                return '!';
-            }
+                //std::cout << "I1 FE, R1 FE, P1 FE\n";
+                return baseTreeD4(baseTreeD3_rotationMatrix3, 1); 
+                // The numbers are like the box we moving to, will upload pic
+            } // B E F
 
             else if (classifyPinky1(baseTreeD3_rotationMatrix3[12][2]) == CurlState::FULL_CURL) { // P1 FC
-                std::cout << "I1 FE, R1 FE, P1 FC\n";
-                return '!';
-            }
+                //std::cout << "I1 FE, R1 FE, P1 FC\n";
+                return baseTreeD4(baseTreeD3_rotationMatrix3, 2); 
+            } // R W
 
             else { // Unknown
+                std::cout << "Case 1 fail\n";
                 return '@';
             }
 
@@ -323,16 +498,17 @@ char baseTreeD3(const std::vector<std::vector<float>>& baseTreeD3_rotationMatrix
         case 2: // I1 FE, F1 FC
             // K L U V Z
             if (classifyMiddle1(baseTreeD3_rotationMatrix3[6][2]) == CurlState::FULL_CURL) { // M1 FC
-                std::cout << "I1 FE, F1 FC, M1 FC\n";
-                return '!';
-            }
+                //std::cout << "I1 FE, F1 FC, M1 FC\n";
+                return baseTreeD4(baseTreeD3_rotationMatrix3, 3); 
+            } // L Z
 
             else if (classifyMiddle1(baseTreeD3_rotationMatrix3[6][2]) == CurlState::FULL_EXTEND) { // M1 FE
-                std::cout << "I1 FE, F1 FC, M1 FE\n";
-                return '!';
-            }
+                //std::cout << "I1 FE, F1 FC, M1 FE\n";
+                return baseTreeD4(baseTreeD3_rotationMatrix3, 4); 
+            } // K U V
 
             else { // Unknown
+                std::cout << "Case 2 fail\n";                
                 return '@';
             }
                     
@@ -340,19 +516,23 @@ char baseTreeD3(const std::vector<std::vector<float>>& baseTreeD3_rotationMatrix
 
         case 3: // I1 FC, P3 FC
             // A N S T
-            // if () { // T1 "in", needs custom
-            //     std::cout << "I1 FC, P3 FC, T1 in\n";
-            //     return '!';
-            // }
+            if (baseTreeD3_rotationMatrix3[1][0] >= -0.250 && baseTreeD3_rotationMatrix3[1][0] <= 0.150 &&
+                baseTreeD3_rotationMatrix3[1][2] >= -0.125 && baseTreeD3_rotationMatrix3[1][2] <= 0.075) {
+                // T1 "in", needs custom
+                //std::cout << "I1 FC, P3 FC, T1 in\n";
+                return baseTreeD4(baseTreeD3_rotationMatrix3, 5); 
+            } // N Y
 
-            // else if () { // T1 position, needs custom
-            //     std::cout << "I1 FC, P3 FC, T1 pos\n";
-            //     return '!';
-            // }
+            else if (baseTreeD3_rotationMatrix3[1][0] >= 0.100 && baseTreeD3_rotationMatrix3[1][0] <= 0.750) { 
+                // T1 position, needs custom
+                //std::cout << "I1 FC, P3 FC, T1 pos\n";
+                return baseTreeD4(baseTreeD3_rotationMatrix3, 6); 
+            } // A S
 
-            // else { // Unknown
+            else { // Unknown
+                std::cout << "Case 3 fail\n";            
                 return '@';
-            // }
+            } // Some flaws, keep in mind tho
                     
             break;
 
@@ -360,17 +540,18 @@ char baseTreeD3(const std::vector<std::vector<float>>& baseTreeD3_rotationMatrix
             // Ik it reuses p1, def a way to combvine to save but idk
             // I M Y
             if (classifyPinky1(baseTreeD3_rotationMatrix3[12][2]) == CurlState::FULL_EXTEND) { // P1 FE
-                std::cout << "I1 FC, P3 FE, P1 FE\n";
-                return '!';
-            }
+                //std::cout << "I1 FC, P3 FE, P1 FE\n";
+                return baseTreeD4(baseTreeD3_rotationMatrix3, 7); 
+            } // I Y
 
             else if (classifyPinky1(baseTreeD3_rotationMatrix3[12][2]) == CurlState::FULL_CURL) { // P1 FC
-                std::cout << "I1 FC, P3 FE, P1 FE\n";
-                return '!';
-            }
+                //std::cout << "I1 FC, P3 FE, P1 FC\n";
+                return 'm';
+            } // M
 
             else { // Unknown
-                return '@';
+                std::cout << "Case 4 fail\n";                
+                return '!';
             }
                         
             break;
@@ -398,6 +579,7 @@ char baseTreeD2(const std::vector<std::vector<float>>& baseTreeD2_rotationMatrix
             }
 
             else { // Unknown
+                std::cout << "Fail 1 fail\n";
                 return '-';
             }
             
@@ -405,7 +587,7 @@ char baseTreeD2(const std::vector<std::vector<float>>& baseTreeD2_rotationMatrix
             
         case CurlState::FULL_CURL: // I1 fully curled
         // A I M N S T Y
-            std::cout << "Curling it\n";
+            //std::cout << "Curling\n";
             if (classifyPinky3(baseTreeD2_rotationMatrix[14][2]) == CurlState::FULL_CURL) { // P3 FC
                 //std::cout << "Yummers pinky curl\n";
                 return baseTreeD3(baseTreeD2_rotationMatrix, 3);
@@ -417,12 +599,14 @@ char baseTreeD2(const std::vector<std::vector<float>>& baseTreeD2_rotationMatrix
             } // I M Y
                 
             else { // Unknown
+                std::cout << "Fail 2 fail\n";
                 return '-';
             }
 
             break;
         
         default:
+            std::cout << "Detection fail\n";
             return '-';
             break;
     }

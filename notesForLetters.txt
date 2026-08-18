@@ -42,32 +42,32 @@ Numbers
     10 - Y (Will be modelled as just thumbs up in this case) DONE
 
 Palm 
-    A - B   
+    A - B   DONE
     B - B   
     C - R   DONE
     D - R   DONE
     E - B   
     F - B   
-    G - Y   
+    G - Y   DONE
     H - Y   DONE (Bit of overlap with P still)
     I - B   
-    J - Y   
+    J - Y   DONE
     K - B   
-    L - B   
-    M - B   
-    N - B   
+    L - B   DONE
+    M - B   DONE
+    N - B   DONE
     O - R   DONE
     P - Y   DONE (Note: A bit weird, just exaggerate spread more and it helps detect)
     Q - RP  - Sometimes works, still not very good
     R - B   
-    S - B   
-    T - B   
+    S - B   DONE
+    T - B   DONE
     U - B   
     V - B   
-    W - B   
+    W - B   DONE
     X - R   DONE
     Y - B   
-    Z - B   
+    Z - B   DONE Needs to be turned slightly from camera
 
 C is a little bit finiky, would like to increase range, but it sorta overlaps onto d so i would rather leave for future improvments under "tuning"
 
@@ -92,9 +92,8 @@ Thumb1
     This one needs to be specific for the particular ones i think
     10:  (-0.807572 - -0.467312, 0.000, -0.186647 - 0.183533)
     RP:  (-0.633507 - -0.119814, 0.000, -0.137239 - 0.114694)
-    A/S: (	)
-    N:	 (	)
-    T:	 (	)
+    A/S: (-0.235589 - 0.128884, 0.000, -0.105231 - 0.0490974)
+    N/T: (0.115063 - 0.601999, 0.000, -0.0921905 - 0.0602665)
 
 Thumb2
     Full Extend: (0.000 - 0.668, 0.000, 0.000)

@@ -37,6 +37,7 @@ Couldn't do here, as many tuning functions overlap. It is not a continuous disti
 rather due to the nature of the rotations a lot of things overlap, so thus are specific to the function itself.
 
 Future improvment idea, if a letter fails, it gives you a possible list of what you were trying to do based on where you were in the decision tree
+Oh also dont want to track every finger cuz again the model if finiky so it would be really ass to tune
 
 C recalibrates
 Always run code with hand in rest position (like high five)
