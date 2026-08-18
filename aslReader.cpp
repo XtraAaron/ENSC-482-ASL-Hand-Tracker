@@ -304,14 +304,17 @@ char reverseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatr
     return '|'  ;
 } // 
 
-// Depth of 5 total
+char baseTreeD5(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix, int combinedResult) {
+    
+}
 
+// Depth of 5 total
 char baseTreeD4(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix, int combinedResult) {
     // std::cout
-    // << " T1 X: " << baseTreeD3_rotationMatrix3[1][0]
-    // << " T1 Z: " << baseTreeD3_rotationMatrix3[1][2]
+    // << " T1 X: " << baseTreeD4_rotationMatrix[1][0]
+    // << " T1 Z: " << baseTreeD4_rotationMatrix[1][2]
     // << "\n"; // Debug stuff     
-    //std::cout << "T1 " << baseTreeD4_rotationMatrix[1][0] << '\n';
+    //std::cout << "I1 " << baseTreeD4_rotationMatrix[3][0] << '\n';
     switch (combinedResult){
         case 1: // I1 FE, R1 FE, P1 FE
         // B E F 7 8
@@ -319,12 +322,12 @@ char baseTreeD4(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix
         //std::cout << "I2 rot: " << baseTreeD4_rotationMatrix[4][2] << '\n';
             if (classifyIndex2(baseTreeD4_rotationMatrix[4][2]) == CurlState::FULL_EXTEND) { // I2 FE
                 //std::cout << "I1 FE, R1 FE, P1 FE, B 7 8\n";
-                return '@';
+                return baseTreeD5(baseTreeD4_rotationMatrix, 1);
             } // B 7 8
 
             else if (classifyIndex2(baseTreeD4_rotationMatrix[4][2]) == CurlState::FULL_CURL) { // I2 FC
                 //std::cout << "I1 FE, R1 FE, P1 FE, E F\n";
-                return '@';
+                return baseTreeD5(baseTreeD4_rotationMatrix, 2);
             } // E F
 
             else { // Unknown
@@ -378,20 +381,20 @@ char baseTreeD4(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix
         case 4: // I1 FE, F1 FC, M1 FE
         // K U V
         std::cout << "Case 4\n";  
-            if (true) { // I1 Spread
-                std::cout << "I1 FE, F1 FC, M1 FE, K V\n";
+            if (baseTreeD4_rotationMatrix[3][0] >= -0.200 && baseTreeD4_rotationMatrix[3][0] <= 0.000) { // I1 Spread out
+                //std::cout << "I1 FE, F1 FC, M1 FE, K V\n";
                 return '@';
             } // K V
 
-            else if (classifyRing2(baseTreeD4_rotationMatrix[10][2]) == CurlState::FULL_CURL) { // R2 FC
-                std::cout << "I1 FE, R1 FE, P1 FC, R\n";
-                return 'r';
-            } // R
-
-            else if (true) { // I1 No Spread
-                std::cout << "I1 FE, F1 FC, M1 FE, U\n";
+            else if (baseTreeD4_rotationMatrix[3][0] >= 0.025 && baseTreeD4_rotationMatrix[3][0] <= 0.175) { // I1 No Spread
+                //std::cout << "I1 FE, F1 FC, M1 FE, U\n";
                 return 'u';
             } // U
+
+            else if (baseTreeD4_rotationMatrix[3][0] >= 0.175 && baseTreeD4_rotationMatrix[3][0] <= 0.300) { // I1 spread in
+                //std::cout << "I1 FE, R1 FE, P1 FC, R\n";
+                return 'r';
+            } // R
 
             else { // Unknown
                 return '#';
@@ -444,13 +447,13 @@ char baseTreeD4(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix
         // I Y
         // Need custom thumb
         std::cout << "Case 7\n";  
-            if (true) {
-                std::cout << "I1 FC, P3 FE, P1 FE, Y\n";
+            if (baseTreeD4_rotationMatrix[1][0] >= 0.000 && baseTreeD4_rotationMatrix[1][0] <= 0.300) {
+                //std::cout << "I1 FC, P3 FE, P1 FE, Y\n";
                 return 'i';
             } // I
 
-            else if (true) {
-                std::cout << "I1 FC, P3 FE, P1 FE, Y\n";
+            else if (baseTreeD4_rotationMatrix[1][0] >= -0.700 && baseTreeD4_rotationMatrix[1][0] <= -0.400) {
+                //std::cout << "I1 FC, P3 FE, P1 FE, Y\n";
                 return 'y';
             } // Y
 
@@ -497,7 +500,10 @@ char baseTreeD3(const std::vector<std::vector<float>>& baseTreeD3_rotationMatrix
 
         case 2: // I1 FE, F1 FC
             // K L U V Z
-            if (classifyMiddle1(baseTreeD3_rotationMatrix3[6][2]) == CurlState::FULL_CURL) { // M1 FC
+            if (classifyMiddle1(baseTreeD3_rotationMatrix3[6][2]) == CurlState::FULL_CURL &&
+                classifyPinky1(baseTreeD3_rotationMatrix3[12][2]) == CurlState::FULL_CURL 
+                // Need pinky 1 to not overlap y amdi
+        ) { // M1 FC
                 //std::cout << "I1 FE, F1 FC, M1 FC\n";
                 return baseTreeD4(baseTreeD3_rotationMatrix3, 3); 
             } // L Z
