@@ -75,8 +75,8 @@ CurlState classifyMiddle1(const float& M1_rotation) {
 }
 
 CurlState classifyMiddle2(const float& M2_rotation) {
-    if (M2_rotation >= -0.550 && M2_rotation <= -0.000) return CurlState::FULL_EXTEND; 
-    else if (M2_rotation >= -1.610 && M2_rotation <= -0.550) return CurlState::FULL_EXTEND; 
+    if (M2_rotation >= -0.570 && M2_rotation <= 0.000) return CurlState::FULL_EXTEND; 
+    else if (M2_rotation >= -1.610 && M2_rotation <= -0.575) return CurlState::FULL_CURL; 
     else return CurlState::UNKNOWN;
 }
 
@@ -86,7 +86,7 @@ CurlState classifyRing1(const float& R1_rotation) {
     else return CurlState::UNKNOWN;
 }
 CurlState classifyRing2(const float& R2_rotation) {
-    if (R2_rotation >= -0.475 && R2_rotation <= -0.075) return CurlState::FULL_EXTEND; // Not measured by hand, if needed change this
+    if (R2_rotation >= -0.475 && R2_rotation <= 0.000) return CurlState::FULL_EXTEND; // Not measured by hand, if needed change this
     else if (R2_rotation >= -1.610 && R2_rotation <= -0.525) return CurlState::FULL_CURL; // Not measured by hand, if needed change this
     else return CurlState::UNKNOWN;
 }
@@ -307,20 +307,28 @@ char reverseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatr
 
 
 // Depth of 5 total
-char baseTreeD5(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix, int combinedResult) {
+char baseTreeD5(const std::vector<std::vector<float>>& baseTreeD5_rotationMatrix, int combinedResult) {
+    std::cout
+    << " T1 X: " << baseTreeD5_rotationMatrix[1][0]
+    << " T1 Z: " << baseTreeD5_rotationMatrix[1][2]
+    << "\n"; // Debug stuff     
     switch (combinedResult) {
         case 1: 
         // B 7 8
-            if () {
-                return 'b';
-            }
-
-            else if () {
+        // I1 FE, R1 FE, P1 FE, I2 FE
+        // Individual, B is last case, 7 checks R2 curl, 8 checks M2 curl, B checks both straight
+        std::cout << "Case 1\n";
+            if (classifyRing2(baseTreeD5_rotationMatrix[10][2]) == CurlState::FULL_CURL) { // Curl R2
                 return '7';
             }
 
-            else if () {
+            else if (classifyMiddle2(baseTreeD5_rotationMatrix[7][2]) == CurlState::FULL_CURL) { // Curl M2
                 return '8';
+            }
+
+            else if (classifyRing2(baseTreeD5_rotationMatrix[10][2]) == CurlState::FULL_EXTEND && // R2 Extended
+                     classifyMiddle2(baseTreeD5_rotationMatrix[7][2]) == CurlState::FULL_EXTEND) { // M2 extended
+                return 'b';
             }
 
             else { // Unknown
@@ -330,11 +338,15 @@ char baseTreeD5(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix
             break;
         case 2: 
         // E F 
-            if () {
+        
+        // I1 FE, R1 FE, P1 FE, I2 FC
+        // Use P3
+        std::cout << "Case 2\n";
+            if (classifyPinky3(baseTreeD5_rotationMatrix[14][2]) == CurlState::FULL_CURL) { // P2 FC
                 return 'e';
             }
 
-            else if () {
+            else if (classifyPinky3(baseTreeD5_rotationMatrix[14][2]) == CurlState::FULL_EXTEND) { // P2 FE
                 return 'f';
             }
 
@@ -345,11 +357,13 @@ char baseTreeD5(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix
             break;
         case 3: 
         // K V
-            if () {
-                return 'k';
+        // Use thumb pos
+        std::cout << "Case 3\n";
+            if (baseTreeD5_rotationMatrix[1][0] >= 0.200 && baseTreeD5_rotationMatrix[1][0] <= 0.350) { // Need fresh one
+                return 'k'; // Add p1 curl to avoid 7 overlap, when testing make sure to test 7
             }
 
-            else if () {
+            else if (baseTreeD5_rotationMatrix[1][0] >= 0.360 && baseTreeD5_rotationMatrix[1][0] <= 0.750) { // Reuse A S
                 return 'v';
             }
 
