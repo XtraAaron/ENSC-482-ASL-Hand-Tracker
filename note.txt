@@ -30,6 +30,7 @@ Fix finger bug - Need to do eventually - Not sure if issue anymore actually
 Fix Q, issue may be with motion of the hand tho. - Q is fucked, idgaf
 
 Future work could include adding more sign language libraries, adding movment of the hand itself, and the different ASl versions
+Also to improve the tree and no repeat everything like we just didm maybe one step at a time or smth
 
 Future improvment for sure, is that ideally we would have a function perform classification
 Couldn't do here, as many tuning functions overlap. It is not a continuous distinct set of values, 

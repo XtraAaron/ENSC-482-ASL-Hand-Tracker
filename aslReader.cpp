@@ -292,45 +292,132 @@ char reverseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatr
 } // 
 
 // Depth of 5 total
-// char baseTreeD3(const std::vector<std::vector<float>>& reverseTree_rotationMatrix3, CurlState result2) {
 
-// }
+char baseTreeD3(const std::vector<std::vector<float>>& baseTreeD3_rotationMatrix3, int combinedResult) { // combinedResult up to 8
+    // Used an int to continue using switch, much nicer than ifs
 
+    std::cout
+    << " T1 X: " << baseTreeD3_rotationMatrix3[1][0]
+    << " T1 Z: " << baseTreeD3_rotationMatrix3[1][2]
+    << "\n"; // Debug stuff 
 
-char baseTreeD2(const std::vector<std::vector<float>>& reverseTree_rotationMatrix2, CurlState result1) { // Each level does a decision process
-    switch (result1){
-        case CurlState::FULL_EXTEND: //  B E F K L R U V W Z
-            //std::cout << "Juicy full extend\n";
-            if (classifyRing1(reverseTree_rotationMatrix2[9][2]) == CurlState::FULL_EXTEND) { // 
-                //std::cout << "Ring extendomatic\n";
-                return '\"';
+    switch (combinedResult){
+        case 1: // I1 FE, R1 FE
+            // B E F R W
+            if (classifyPinky1(baseTreeD3_rotationMatrix3[12][2]) == CurlState::FULL_EXTEND) { // P1 FE
+                std::cout << "I1 FE, R1 FE, P1 FE\n";
+                return '!';
             }
 
-            else if (classifyRing1(reverseTree_rotationMatrix2[9][2]) == CurlState::FULL_CURL) {
-                //std::cout << "Ring crusher\n";
-                return '\"';
+            else if (classifyPinky1(baseTreeD3_rotationMatrix3[12][2]) == CurlState::FULL_CURL) { // P1 FC
+                std::cout << "I1 FE, R1 FE, P1 FC\n";
+                return '!';
             }
 
             else { // Unknown
-                return ':';
+                return '@';
+            }
+
+            break;
+
+        case 2: // I1 FE, F1 FC
+            // K L U V Z
+            if (classifyMiddle1(baseTreeD3_rotationMatrix3[6][2]) == CurlState::FULL_CURL) { // M1 FC
+                std::cout << "I1 FE, F1 FC, M1 FC\n";
+                return '!';
+            }
+
+            else if (classifyMiddle1(baseTreeD3_rotationMatrix3[6][2]) == CurlState::FULL_EXTEND) { // M1 FE
+                std::cout << "I1 FE, F1 FC, M1 FE\n";
+                return '!';
+            }
+
+            else { // Unknown
+                return '@';
+            }
+                    
+            break;
+
+        case 3: // I1 FC, P3 FC
+            // A N S T
+            // if () { // T1 "in", needs custom
+            //     std::cout << "I1 FC, P3 FC, T1 in\n";
+            //     return '!';
+            // }
+
+            // else if () { // T1 position, needs custom
+            //     std::cout << "I1 FC, P3 FC, T1 pos\n";
+            //     return '!';
+            // }
+
+            // else { // Unknown
+                return '@';
+            // }
+                    
+            break;
+
+        case 4: // I1 FC, P3 FE
+            // Ik it reuses p1, def a way to combvine to save but idk
+            // I M Y
+            if (classifyPinky1(baseTreeD3_rotationMatrix3[12][2]) == CurlState::FULL_EXTEND) { // P1 FE
+                std::cout << "I1 FC, P3 FE, P1 FE\n";
+                return '!';
+            }
+
+            else if (classifyPinky1(baseTreeD3_rotationMatrix3[12][2]) == CurlState::FULL_CURL) { // P1 FC
+                std::cout << "I1 FC, P3 FE, P1 FE\n";
+                return '!';
+            }
+
+            else { // Unknown
+                return '@';
+            }
+                        
+            break;
+
+        default:
+            return '!';
+            break;
+    }
+}
+
+
+char baseTreeD2(const std::vector<std::vector<float>>& baseTreeD2_rotationMatrix, CurlState result1) { // Each level does a decision process
+    switch (result1){
+        case CurlState::FULL_EXTEND: // I1 full extended
+        //  B E F K L R U V W Z 7 8
+            //std::cout << "Juicy full extend\n";
+            if (classifyRing1(baseTreeD2_rotationMatrix[9][2]) == CurlState::FULL_EXTEND) { // 
+                //std::cout << "Ring extend\n";
+                return baseTreeD3(baseTreeD2_rotationMatrix, 1);
+            } // B E F R W 7 8
+
+            else if (classifyRing1(baseTreeD2_rotationMatrix[9][2]) == CurlState::FULL_CURL) {
+                //std::cout << "Ring crusher\n";
+                return baseTreeD3(baseTreeD2_rotationMatrix, 2);
+            }
+
+            else { // Unknown
+                return '-';
             }
             
             break;
             
-        case CurlState::FULL_CURL: // A I M N S T Y
+        case CurlState::FULL_CURL: // I1 fully curled
+        // A I M N S T Y
             std::cout << "Curling it\n";
-            if (classifyPinky3(reverseTree_rotationMatrix2[14][2]) == CurlState::FULL_CURL) { // P3 FC
+            if (classifyPinky3(baseTreeD2_rotationMatrix[14][2]) == CurlState::FULL_CURL) { // P3 FC
                 //std::cout << "Yummers pinky curl\n";
-                return '\'';
+                return baseTreeD3(baseTreeD2_rotationMatrix, 3);
             } // A N S T
 
-            else if (classifyPinky3(reverseTree_rotationMatrix2[14][2]) == CurlState::FULL_EXTEND) { // P3 FE
-                std::cout << "Oi ugihi my pinkie's xtended\n";
-                return '\'';
+            else if (classifyPinky3(baseTreeD2_rotationMatrix[14][2]) == CurlState::FULL_EXTEND) { // P3 FE
+                //std::cout << "Pinkie's extended\n";
+                return baseTreeD3(baseTreeD2_rotationMatrix, 4);
             } // I M Y
                 
             else { // Unknown
-                return ';';
+                return '-';
             }
 
             break;
@@ -341,14 +428,14 @@ char baseTreeD2(const std::vector<std::vector<float>>& reverseTree_rotationMatri
     }
 }
 
-char baseTreeD1(const std::vector<std::vector<float>>& reverseTree_rotationMatrix1) { // Maybe should have started at 0 idgaf
+char baseTreeD1(const std::vector<std::vector<float>>& baseTreeD1_rotationMatrix) { // Maybe should have started at 0 idgaf
     // Def better ways to do this
-    if (classifyIndex1(reverseTree_rotationMatrix1[3][2]) == CurlState::FULL_EXTEND) { // I1 FE
-        return baseTreeD2(reverseTree_rotationMatrix1, CurlState::FULL_EXTEND);
-    } //  B E F K L R U V W Z
+    if (classifyIndex1(baseTreeD1_rotationMatrix[3][2]) == CurlState::FULL_EXTEND) { // I1 FE
+        return baseTreeD2(baseTreeD1_rotationMatrix, CurlState::FULL_EXTEND);
+    } //  B E F K L R U V W Z 7 8
 
-    else if (classifyIndex1(reverseTree_rotationMatrix1[3][2]) == CurlState::FULL_CURL) { // I1 FC
-        return baseTreeD2(reverseTree_rotationMatrix1, CurlState::FULL_CURL);
+    else if (classifyIndex1(baseTreeD1_rotationMatrix[3][2]) == CurlState::FULL_CURL) { // I1 FC
+        return baseTreeD2(baseTreeD1_rotationMatrix, CurlState::FULL_CURL);
     } // A I M N S T Y
         
     else { // Unknown
