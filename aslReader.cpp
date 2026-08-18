@@ -131,10 +131,11 @@ wristState returnWristState(const std::vector<std::vector<float>>& returnWristSt
         //std::cout << "This is in Reverse State state\n\n";
         return REVERSE_ROLL;
     } // Basically divide roll into 2 sections, reversed wrist and sideways
-    else if (returnWristState_RotationMatrix[0] >= std::vector<float>{-0.100, -0.175, -0.300} &&  
-        returnWristState_RotationMatrix[0] <= std::vector<float>{0.245, 0.115, 0.300}){ // Base state
+    else if (returnWristState_RotationMatrix[0][0] >= -0.350 && returnWristState_RotationMatrix[0][0] <= 0.325 && // X
+             returnWristState_RotationMatrix[0][1] >= -0.500 && returnWristState_RotationMatrix[0][1] <= 0.500 && // Y
+             returnWristState_RotationMatrix[0][2] >= -0.500 && returnWristState_RotationMatrix[0][2] <= 0.500) { // Z
         //std::cout << "This is in base state\n\n";
-        return BASE;
+        return BASE; // Base state
     }
     else if (returnWristState_RotationMatrix[0][0] >= 0.600 && returnWristState_RotationMatrix[0][0] <= 1.00 && // Track everything individually to remove overlap
              returnWristState_RotationMatrix[0][1] >= -2.000 && returnWristState_RotationMatrix[0][1] <= -1.000 &&
@@ -387,7 +388,7 @@ void decisionTree(const std::vector<std::vector<float>>& decisionTree_rotationMa
             break;
 
         case UNKNOWN:
-            std::cout << "Unknown Value\n";
+            std::cout << "Unknown Wrist Rotation\n";
             break;
         default:
             std::cout << "An error has occured in the wrist state";
