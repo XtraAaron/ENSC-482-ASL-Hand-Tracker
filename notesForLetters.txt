@@ -36,7 +36,7 @@ Numbers
     4 - RP                                                   DONE
     5 - RP                                                   DONE
     6 - Same as W if it can track W it can track 6           DONE
-    7 - B - Need to integrate                                DONE
+    7 - B - Need to integrate                                DONE (Have last 2 ring segments straight, and have it touch the joint between the 2 thumb segments)
     8 - B - Need to integrate                                DONE
     9 - Same as F if it can track F it can track 9           
     10 - Y (Will be modelled as just thumbs up in this case) DONE
@@ -52,7 +52,7 @@ Palm
     H - Y   DONE (Bit of overlap with P still, just make sure to tuck thumb in strongly)
     I - B   DONE
     J - Y   DONE
-    K - B   
+    K - B   DONE
     L - B   DONE
     M - B   DONE
     N - B   DONE
@@ -63,7 +63,7 @@ Palm
     S - B   DONE
     T - B   DONE
     U - B   DONE
-    V - B   
+    V - B   DONE
     W - B   DONE
     X - R   DONE
     Y - B   DONE
