@@ -256,18 +256,18 @@ char reverseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatr
     }
 
     else { // T1 in (1, 2, 4)
-        if (classifyMiddle1(reverseTree_rotationMatrix[6][2]) == CurlState::FULL_EXTEND) { // M1 FE
-            if (reverseTree_rotationMatrix[12][2] >= -1.610 && reverseTree_rotationMatrix[12][2] <= -0.450 && // P1 FE
-                classifyIndex1(reverseTree_rotationMatrix[3][2]) == CurlState::FULL_EXTEND) { // I1 FE
+        if (reverseTree_rotationMatrix[6][2] >= -0.475 && reverseTree_rotationMatrix[6][2] <= 0.250) { // M1 FE
+            if (reverseTree_rotationMatrix[12][2] >= -0.500 && reverseTree_rotationMatrix[12][2] <= -0.425 // P1 FE
+            ) { // P1 FE
                 return '4';
             } // 4
 
-            else if (classifyIndex1(reverseTree_rotationMatrix[3][2]) == CurlState::FULL_EXTEND) { // I1 FE
+            else if (reverseTree_rotationMatrix[3][2] >= -0.375 && reverseTree_rotationMatrix[3][2] <= -0.075) { // I1 FE
                 return '2';
             }   
         } // 2, 4
 
-        else if (classifyIndex1(reverseTree_rotationMatrix[3][2]) == CurlState::FULL_EXTEND) { // I1
+        else if (reverseTree_rotationMatrix[3][2] >= -0.350 && reverseTree_rotationMatrix[3][2] <= -0.125) { // I1
             return '1';
         } // 1
 
