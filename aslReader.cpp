@@ -228,11 +228,11 @@ char yawTree(const std::vector<std::vector<float>>& yawTree_rotationMatrix) {
 
 
 char reverseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatrix) { //
-    std::cout
-    << " P1: " << reverseTree_rotationMatrix[12][2]
-    << " M1: " << reverseTree_rotationMatrix[6][2]
-    << " I1: " << reverseTree_rotationMatrix[3][2]
-    << "\n"; // Debug stuff  
+    // std::cout
+    // << " P1: " << reverseTree_rotationMatrix[12][2]
+    // << " M1: " << reverseTree_rotationMatrix[6][2]
+    // << " I1: " << reverseTree_rotationMatrix[3][2]
+    // << "\n"; // Debug stuff  
 
     if (reverseTree_rotationMatrix[1][0] >= -0.825 && reverseTree_rotationMatrix[1][0] <= -0.050 ) { // T1 Out (3, 5)
         // T1 stuff maybe possible to make its own function? I dont want to rn tho when its uncertain (esp with like a, s and t)
