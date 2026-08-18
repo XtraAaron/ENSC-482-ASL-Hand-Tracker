@@ -52,6 +52,7 @@ Pinky3	14
 // All bounds hand tuned
 CurlState classifyIndex1(const float& I1_rotation) {
     if (I1_rotation >= -0.500 && I1_rotation <= -0.100) return CurlState::FULL_EXTEND; // Full extend state
+    if (I1_rotation >= -1.610 && I1_rotation <= 0.525) return CurlState::FULL_CURL;
     else return CurlState::UNKNOWN; // Unknown state
 }
 
@@ -71,20 +72,28 @@ CurlState classifyMiddle2(const float& M2_rotation) {
     else return CurlState::UNKNOWN;
 }
 
-// CurlState classifyRing1(const float& R1_rotation) {
-//     if (R1_rotation >= -0.700 && R1_rotation <= -0.275) return CurlState::FULL_EXTEND; // Not measured by hand, if needed change this
-//     else if (R1_rotation >= -1.610 && R1_rotation <= -0.275) return CurlState::FULL_CURL; // Not measured by hand, if needed change this
-//     else return CurlState::UNKNOWN;
-// }
+CurlState classifyRing1(const float& R1_rotation) {
+    if (R1_rotation >= -0.475 && R1_rotation <= -0.075) return CurlState::FULL_EXTEND; // Not measured by hand, if needed change this
+    else if (R1_rotation >= -1.610 && R1_rotation <= -0.525) return CurlState::FULL_CURL; // Not measured by hand, if needed change this
+    else return CurlState::UNKNOWN;
+}
 
 CurlState classifyPinky1(const float& P1_rotation) {
     if (P1_rotation >= -0.700 && P1_rotation <= -0.450) return CurlState::FULL_EXTEND; 
     //else if (P1_rotation >= -1.610 && P1_rotation <= -0.500) return CurlState::FULL_CURL; // Not measured by hand, if needed change this
     else return CurlState::UNKNOWN;
 }
+
+CurlState classifyPinky3(const float& P3_rotation) {
+    if (P3_rotation >= -0.225 && P3_rotation <= -0.000) return CurlState::FULL_EXTEND; 
+    else if (P3_rotation >= -1.610 && P3_rotation <= -0.850) return CurlState::FULL_CURL; // Not measured by hand, if needed change this
+    else return CurlState::UNKNOWN;
+}
 // This stuff partially used, check notes on why. Much easier on full curl and extend, due to how often they used vs semi
 // Also why no yaw function.
 // Wrist is specific, so it just gets mashed into its own function anyways
+
+// May change, using it a lot in base change comment if needed
 
 
 int frameCounter;
@@ -281,150 +290,71 @@ char reverseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatr
     return '|'  ;
 } // 
 
+// Depth of 5 total
+// char baseTreeD3(const std::vector<std::vector<float>>& reverseTree_rotationMatrix3, CurlState result2) {
 
-char baseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatrix) { // Depth of 5
-    // This is kind of shit but idgaf
-    if () { // I1 FE
-        if () { // R1 FE
-            if () { // P1 FE
-                if () { // I2 FE
-                    if () { // M2 FE
-                        if () { // R2 ~FC
+// }
 
-                        }
 
-                        else if () { // R2 FE
-
-                        }
-
-                        else {
-
-                        }
-                    }
-
-                    else if () {
-
-                    }
-
-                    else {
-
-                    }
-                }
-
-                else if () { // I2 FC
-                    if () { // M2 FE
-
-                    }
-
-                    else if() { // M2 FC
-
-                    }
-
-                    else {
-
-                    }
-                }
-
-                else {
-
-                }
+char baseTreeD2(const std::vector<std::vector<float>>& reverseTree_rotationMatrix2, CurlState result1) { // Each level does a decision process
+    switch (result1){
+        case CurlState::FULL_EXTEND: //  B E F K L R U V W Z
+            //std::cout << "Juicy full extend\n";
+            if (classifyRing1(reverseTree_rotationMatrix2[9][2]) == CurlState::FULL_EXTEND) { // 
+                //std::cout << "Ring extendomatic\n";
+                return '\"';
             }
 
-            else if (){ // P1 FC
-                if () { // R2 FE
-
-                }
-
-                else if () { // R2 FC
-
-                }
-
-                else {
-
-                }
+            else if (classifyRing1(reverseTree_rotationMatrix2[9][2]) == CurlState::FULL_CURL) {
+                //std::cout << "Ring crusher\n";
+                return '\"';
             }
 
-            else {
-                if () { // M1 FC
-                    // Thumb check
-                }
-
-                else if () { // M1 FE
-                    if () { // Yes spread
-                        if () { // T2 FE
-
-                        }
-
-                        else if () {// T2 FC
-                            
-                        }
-
-                        else {
-                            
-                        }
-                    }
-
-                    else { // No spread
-
-                    }
-                }
-
-                else {
-
-                }
+            else { // Unknown
+                return ':';
             }
-        }
+            
+            break;
+            
+        case CurlState::FULL_CURL: // A I M N S T Y
+            std::cout << "Curling it\n";
+            if (classifyPinky3(reverseTree_rotationMatrix2[14][2]) == CurlState::FULL_CURL) { // P3 FC
+                //std::cout << "Yummers pinky curl\n";
+                return '\'';
+            } // A N S T
 
-        else if () { // R1 FC
-            if () { // P3 FC
-                if () { // Thumb in
-                    if () { // M1 less curl?
-
-                    }
-
-                    else { // M1 FC
-
-                    }
-                }
-
-                else { // T1 Pos?
-                    if { // M2 FE
-
-                    }
-                    else if () { // M2 FC
-
-                    }
-
-                    else {
-
-                    }
-                }
+            else if (classifyPinky3(reverseTree_rotationMatrix2[14][2]) == CurlState::FULL_EXTEND) { // P3 FE
+                std::cout << "Oi ugihi my pinkie's xtended\n";
+                return '\'';
+            } // I M Y
+                
+            else { // Unknown
+                return ';';
             }
 
-            else if () { // P3 FE
-                if () { // P1 FE
-                    // T1 check
-                }
-
-                else { // P1 FC
-
-                }
-            }
-        }
-
-        else {
-            return '+';
-        }
-    } // B E F K L R U V W Z
-
-    else if () { // I1 FC
-
-    } // A I M N S T Y
-
-    else { // Default
-        return '|';
+            break;
+        
+        default:
+            return '-';
+            break;
     }
 }
+
+char baseTreeD1(const std::vector<std::vector<float>>& reverseTree_rotationMatrix1) { // Maybe should have started at 0 idgaf
+    // Def better ways to do this
+    if (classifyIndex1(reverseTree_rotationMatrix1[3][2]) == CurlState::FULL_EXTEND) { // I1 FE
+        return baseTreeD2(reverseTree_rotationMatrix1, CurlState::FULL_EXTEND);
+    } //  B E F K L R U V W Z
+
+    else if (classifyIndex1(reverseTree_rotationMatrix1[3][2]) == CurlState::FULL_CURL) { // I1 FC
+        return baseTreeD2(reverseTree_rotationMatrix1, CurlState::FULL_CURL);
+    } // A I M N S T Y
+        
+    else { // Unknown
+        return '+';
+    }
+
+} // Since ω1 is so massive, for readability each depth is getting split into its own function for easy tracking
 
 
 void decisionTree(const std::vector<std::vector<float>>& decisionTree_rotationMatrix){
@@ -433,7 +363,8 @@ void decisionTree(const std::vector<std::vector<float>>& decisionTree_rotationMa
     //std::cout << "Current X wrist: " << decisionTree_rotationMatrix[0][0] << '\n';
     switch (wristEnum){
         case BASE:
-            std::cout << "Ello im a base placeholder\n"; // This will call a whole new function, as ω1 is fucking huge
+            temp = baseTreeD1(decisionTree_rotationMatrix);
+            std::cout << "We detected " << temp << "\n"; // Debug
             break;
         case ROLL: // ω2
             temp = rollTree(decisionTree_rotationMatrix);
