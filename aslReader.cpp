@@ -47,30 +47,37 @@ Pinky3	14
 #define NUM_BONES 15 // Number of bones
 #define NUM_FLOAT 45 // Would perefer double byt python packs in floats
 
-
+// All bounds hand tuned
 CurlState classifyIndex1(const float& I1_rotation) {
-    if (I1_rotation >= -0.500 && I1_rotation <= -0.100) return CurlState::FULL_EXTEND; 
-    else return CurlState::UNKNOWN;
+    if (I1_rotation >= -0.500 && I1_rotation <= -0.100) return CurlState::FULL_EXTEND; // Full extend state
+    else return CurlState::UNKNOWN; // Unknown state
 }
 
 CurlState classifyIndex2(const float& I2_rotation) {
-    if (I2_rotation >= -1.600 && I2_rotation <= -0.700) return CurlState::FULL_CURL; // X (I2 FC)
+    if (I2_rotation >= -1.600 && I2_rotation <= -0.700) return CurlState::FULL_CURL; // Full curl state
     else return CurlState::UNKNOWN;
 }
 
 CurlState classifyMiddle1(const float& M1_rotation) {
-    if (M1_rotation >= -0.525 && M1_rotation <= -0.070) return CurlState::FULL_EXTEND; // H/P gate
-    else if (M1_rotation >= -1.610 && M1_rotation <= -0.450) return CurlState::FULL_CURL; // G/J/10 gate -- overlaps prior FULL_CURL range, keep this order
+    if (M1_rotation >= -0.525 && M1_rotation <= -0.070) return CurlState::FULL_EXTEND; 
+    else if (M1_rotation >= -1.610 && M1_rotation <= -0.450) return CurlState::FULL_CURL; 
     else return CurlState::UNKNOWN;
 }
 
 CurlState classifyMiddle2(const float& M2_rotation) {
-    if (M2_rotation >= -0.550 && M2_rotation <= -0.000) return CurlState::FULL_EXTEND; // H
+    if (M2_rotation >= -0.550 && M2_rotation <= -0.000) return CurlState::FULL_EXTEND; 
     else return CurlState::UNKNOWN;
 }
 
+// CurlState classifyRing1(const float& R1_rotation) {
+//     if (R1_rotation >= -0.700 && R1_rotation <= -0.275) return CurlState::FULL_EXTEND; // Not measured by hand, if needed change this
+//     else if (R1_rotation >= -1.610 && R1_rotation <= -0.275) return CurlState::FULL_CURL; // Not measured by hand, if needed change this
+//     else return CurlState::UNKNOWN;
+// }
+
 CurlState classifyPinky1(const float& P1_rotation) {
-    if (P1_rotation >= -0.700 && P1_rotation <= -0.450) return CurlState::FULL_EXTEND; // J
+    if (P1_rotation >= -0.700 && P1_rotation <= -0.450) return CurlState::FULL_EXTEND; 
+    //else if (P1_rotation >= -1.610 && P1_rotation <= -0.500) return CurlState::FULL_CURL; // Not measured by hand, if needed change this
     else return CurlState::UNKNOWN;
 }
 // This stuff partially used, check notes on why. Much easier on full curl and extend, due to how often they used vs semi
@@ -220,27 +227,28 @@ char yawTree(const std::vector<std::vector<float>>& yawTree_rotationMatrix) {
 // Add J to use M1 too (FC)
 
 
-char reverseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatrix) { // For this everything is FE
+char reverseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatrix) { //
     std::cout
-    << " T1 X: " << reverseTree_rotationMatrix[1][0]
-    << " T1 z: " << reverseTree_rotationMatrix[1][2]
+    << " P1: " << reverseTree_rotationMatrix[12][2]
+    << " M1: " << reverseTree_rotationMatrix[6][2]
+    << " I1: " << reverseTree_rotationMatrix[3][2]
     << "\n"; // Debug stuff  
 
-    if (reverseTree_rotationMatrix[1][0] >= -0.675 && reverseTree_rotationMatrix[1][0] <= -0.075 ) { // T1 Out (3, 5)
-        if (reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450 && // P1
-            reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450 && // R1
-            reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450 && // M1
-            reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450) { // I1
-
-            return '5';
-        } // 5
-
-        else if (reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450 && // M1
-                reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450) { // I1
-        
-            return '3'; // Probably should have a check here tbh, but if it detects a 3 good enough for me
-            // Def future work material
+    if (reverseTree_rotationMatrix[1][0] >= -0.825 && reverseTree_rotationMatrix[1][0] <= -0.050 ) { // T1 Out (3, 5)
+        // T1 stuff maybe possible to make its own function? I dont want to rn tho when its uncertain (esp with like a, s and t)
+        if (reverseTree_rotationMatrix[12][2] >= -1.100 && reverseTree_rotationMatrix[12][2] <= -0.550 && // P1 FE
+            reverseTree_rotationMatrix[6][2] >= -0.850 && reverseTree_rotationMatrix[6][2] <= -0.125 && // M1 FE
+            reverseTree_rotationMatrix[3][2] >= -0.725 && reverseTree_rotationMatrix[3][2] <= -0.200) { // I1 FE
+            return '3';
         } // 3
+
+        else if (reverseTree_rotationMatrix[12][2] >= -0.600 && reverseTree_rotationMatrix[12][2] <= -0.400 && // P1 FE
+                reverseTree_rotationMatrix[6][2] >= -0.850 && reverseTree_rotationMatrix[6][2] <= 0.000 && // M1 FE
+                reverseTree_rotationMatrix[3][2] >= -0.725 && reverseTree_rotationMatrix[3][2] <= -0.175) { // I1 FE
+        
+            return '5'; // Probably should have a check here tbh, but if it detects a 5 good enough for me
+            // Def future work material
+        } // 5
 
         else {
             return '-';
@@ -248,19 +256,18 @@ char reverseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatr
     }
 
     else { // T1 in (1, 2, 4)
-        if (reverseTree_rotationMatrix[6][2] >= -0.525 && reverseTree_rotationMatrix[6][2] <= -0.050) { // M1
-            if (reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450 && // P1
-                reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450 && // R1
-                reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450) { // I1
+        if (classifyMiddle1(reverseTree_rotationMatrix[6][2]) == CurlState::FULL_EXTEND) { // M1 FE
+            if (reverseTree_rotationMatrix[12][2] >= -1.610 && reverseTree_rotationMatrix[12][2] <= -0.450 && // P1 FE
+                classifyIndex1(reverseTree_rotationMatrix[3][2]) == CurlState::FULL_EXTEND) { // I1 FE
                 return '4';
             } // 4
 
-            else if (reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450) { // I1
+            else if (classifyIndex1(reverseTree_rotationMatrix[3][2]) == CurlState::FULL_EXTEND) { // I1 FE
                 return '2';
             }   
         } // 2, 4
 
-        else if (reverseTree_rotationMatrix[12][2] >= -0.700 && reverseTree_rotationMatrix[12][2] <= -0.450) { // I1
+        else if (classifyIndex1(reverseTree_rotationMatrix[3][2]) == CurlState::FULL_EXTEND) { // I1
             return '1';
         } // 1
 

@@ -30,16 +30,16 @@ Needed joints to measure
 Q Doesnt really work tbh, might skip and put in future improvments?
 
 Numbers 
-    1 - RP
+    1 - RP                                                   DONE
     2 - RP
-    3 - RP
-    4 - RP
-    5 - RP
-    6 - Same as W if it can track W it can track 6
-    7 - B - Need to integrate
-    8 - B - Need to integrate
-    9 - Same as F if it can track F it can track 9
-    10 - Y (Will be modelled as just thumbs up in this case)
+    3 - RP                                                   DONE
+    4 - RP                                                   DONE
+    5 - RP                                                   
+    6 - Same as W if it can track W it can track 6           
+    7 - B - Need to integrate                                
+    8 - B - Need to integrate                                
+    9 - Same as F if it can track F it can track 9           
+    10 - Y (Will be modelled as just thumbs up in this case) DONE
 
 Palm 
     A - B   
