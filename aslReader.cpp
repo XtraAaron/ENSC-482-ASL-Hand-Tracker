@@ -304,11 +304,67 @@ char reverseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatr
     return '|'  ;
 } // 
 
-char baseTreeD5(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix, int combinedResult) {
-    
-}
+
 
 // Depth of 5 total
+char baseTreeD5(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix, int combinedResult) {
+    switch (combinedResult) {
+        case 1: 
+        // B 7 8
+            if () {
+                return 'b';
+            }
+
+            else if () {
+                return '7';
+            }
+
+            else if () {
+                return '8';
+            }
+
+            else { // Unknown
+                return '%';
+            }
+
+            break;
+        case 2: 
+        // E F 
+            if () {
+                return 'e';
+            }
+
+            else if () {
+                return 'f';
+            }
+
+            else { // Unknown
+                return '%';
+            }   
+
+            break;
+        case 3: 
+        // K V
+            if () {
+                return 'k';
+            }
+
+            else if () {
+                return 'v';
+            }
+
+            else { // Unknown
+                return '%';
+            }   
+                       
+            break;
+        default:
+            return '%';
+            break;
+
+    }
+}
+
 char baseTreeD4(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix, int combinedResult) {
     // std::cout
     // << " T1 X: " << baseTreeD4_rotationMatrix[1][0]
@@ -318,7 +374,7 @@ char baseTreeD4(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix
     switch (combinedResult){
         case 1: // I1 FE, R1 FE, P1 FE
         // B E F 7 8
-        std::cout << "Case 1\n";
+        //std::cout << "Case 1\n";
         //std::cout << "I2 rot: " << baseTreeD4_rotationMatrix[4][2] << '\n';
             if (classifyIndex2(baseTreeD4_rotationMatrix[4][2]) == CurlState::FULL_EXTEND) { // I2 FE
                 //std::cout << "I1 FE, R1 FE, P1 FE, B 7 8\n";
@@ -338,7 +394,7 @@ char baseTreeD4(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix
 
         case 2: // I1 FE, R1 FE, P1 FC
         // R W
-        std::cout << "Case 2\n";        
+        //std::cout << "Case 2\n";        
             if (classifyRing2(baseTreeD4_rotationMatrix[10][2]) == CurlState::FULL_EXTEND) { // R2 FE
                 //std::cout << "I1 FE, R1 FE, P1 FC, W\n";
                 return 'w';
@@ -360,7 +416,7 @@ char baseTreeD4(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix
         case 3: // I1 FE, F1 FC, M1 FC
         // L Z
         // Reuse x curl for z
-        std::cout << "Case 3\n";  
+        //std::cout << "Case 3\n";  
         //std::cout << "I3 rot: " << baseTreeD4_rotationMatrix[5][2] << '\n';
             if (classifyIndex3(baseTreeD4_rotationMatrix[5][2]) == CurlState::FULL_CURL) { // I3 FC
                 //std::cout << "I1 FE, F1 FC, M1 FC, Z\n";
@@ -380,10 +436,10 @@ char baseTreeD4(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix
 
         case 4: // I1 FE, F1 FC, M1 FE
         // K U V
-        std::cout << "Case 4\n";  
+        //std::cout << "Case 4\n";  
             if (baseTreeD4_rotationMatrix[3][0] >= -0.200 && baseTreeD4_rotationMatrix[3][0] <= 0.000) { // I1 Spread out
                 //std::cout << "I1 FE, F1 FC, M1 FE, K V\n";
-                return '@';
+                return baseTreeD5(baseTreeD4_rotationMatrix, 3);
             } // K V
 
             else if (baseTreeD4_rotationMatrix[3][0] >= 0.025 && baseTreeD4_rotationMatrix[3][0] <= 0.175) { // I1 No Spread
@@ -446,7 +502,7 @@ char baseTreeD4(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix
         case 7: // I1 FC, P3 FE, P1 FE
         // I Y
         // Need custom thumb
-        std::cout << "Case 7\n";  
+        //std::cout << "Case 7\n";  
             if (baseTreeD4_rotationMatrix[1][0] >= 0.000 && baseTreeD4_rotationMatrix[1][0] <= 0.300) {
                 //std::cout << "I1 FC, P3 FE, P1 FE, Y\n";
                 return 'i';
@@ -463,7 +519,7 @@ char baseTreeD4(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix
                         
             break;
         default:
-            return '$';
+            return '#';
             break;            
     }
 
