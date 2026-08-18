@@ -19,6 +19,8 @@ enum class CurlState {
     FULL_EXTEND,
     UNKNOWN };
 // Future improvment for sure, is that ideally we would have a function perform classification
+// If we used this, we could easily switch to switch instead of many ifs
+
 
 #pragma comment(lib, "Ws2_32.lib") // Autolink Winsock if using MSVC
 // Not needed if runing g++ tho
@@ -278,6 +280,151 @@ char reverseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatr
 
     return '|'  ;
 } // 
+
+
+char baseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatrix) { // Depth of 5
+    // This is kind of shit but idgaf
+    if () { // I1 FE
+        if () { // R1 FE
+            if () { // P1 FE
+                if () { // I2 FE
+                    if () { // M2 FE
+                        if () { // R2 ~FC
+
+                        }
+
+                        else if () { // R2 FE
+
+                        }
+
+                        else {
+
+                        }
+                    }
+
+                    else if () {
+
+                    }
+
+                    else {
+
+                    }
+                }
+
+                else if () { // I2 FC
+                    if () { // M2 FE
+
+                    }
+
+                    else if() { // M2 FC
+
+                    }
+
+                    else {
+
+                    }
+                }
+
+                else {
+
+                }
+            }
+
+            else if (){ // P1 FC
+                if () { // R2 FE
+
+                }
+
+                else if () { // R2 FC
+
+                }
+
+                else {
+
+                }
+            }
+
+            else {
+                if () { // M1 FC
+                    // Thumb check
+                }
+
+                else if () { // M1 FE
+                    if () { // Yes spread
+                        if () { // T2 FE
+
+                        }
+
+                        else if () {// T2 FC
+                            
+                        }
+
+                        else {
+                            
+                        }
+                    }
+
+                    else { // No spread
+
+                    }
+                }
+
+                else {
+
+                }
+            }
+        }
+
+        else if () { // R1 FC
+            if () { // P3 FC
+                if () { // Thumb in
+                    if () { // M1 less curl?
+
+                    }
+
+                    else { // M1 FC
+
+                    }
+                }
+
+                else { // T1 Pos?
+                    if { // M2 FE
+
+                    }
+                    else if () { // M2 FC
+
+                    }
+
+                    else {
+
+                    }
+                }
+            }
+
+            else if () { // P3 FE
+                if () { // P1 FE
+                    // T1 check
+                }
+
+                else { // P1 FC
+
+                }
+            }
+        }
+
+        else {
+            return '+';
+        }
+    } // B E F K L R U V W Z
+
+    else if () { // I1 FC
+
+    } // A I M N S T Y
+
+    else { // Default
+        return '|';
+    }
+}
 
 
 void decisionTree(const std::vector<std::vector<float>>& decisionTree_rotationMatrix){
