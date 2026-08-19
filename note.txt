@@ -58,6 +58,9 @@ Using the one euro filter, as it says and i quote "Noisy signals are a common pr
 https://pypi.org/project/OneEuroFilter/
 Need to run pip install OneEuroFilter
 
+https://sketchfab.com/3d-models/rigged-wooden-puppet-hand-461e0d118d634f46917c418b231ad763
+Puppet hand source
+
 Capitals are impossible, so no.
 
 Due to how its implimented, 10 is represented as a 0. Its still 10, not 0
