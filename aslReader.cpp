@@ -495,7 +495,7 @@ char baseTreeD4(const std::vector<std::vector<float>>& baseTreeD4_rotationMatrix
         case 6: // I1 FC, P3 FC, T1
         // T N
         //std::cout << "T1 " << baseTreeD4_rotationMatrix[1][0] << '\n';
-        std::cout << "Case 6\n";  
+        //std::cout << "Case 6\n";  
             if (baseTreeD4_rotationMatrix[1][0] >= 0.200 && baseTreeD4_rotationMatrix[1][0] <= 0.450) { // I3 FE
                 //std::cout << "I1 FC, P3 FC, T1, T\n";
                 return 't';
@@ -562,7 +562,7 @@ char baseTreeD3(const std::vector<std::vector<float>>& baseTreeD3_rotationMatrix
             } // R W
 
             else { // Unknown
-                std::cout << "Case 1 fail\n";
+                //std::cout << "Case 1 fail\n";
                 return '@';
             }
 
@@ -584,7 +584,7 @@ char baseTreeD3(const std::vector<std::vector<float>>& baseTreeD3_rotationMatrix
             } // K U V
 
             else { // Unknown
-                std::cout << "Case 2 fail\n";                
+                //std::cout << "Case 2 fail\n";                
                 return '@';
             }
                     
@@ -606,7 +606,7 @@ char baseTreeD3(const std::vector<std::vector<float>>& baseTreeD3_rotationMatrix
             } // A S
 
             else { // Unknown
-                std::cout << "Case 3 fail\n";            
+                //std::cout << "Case 3 fail\n";            
                 return '@';
             } // Some flaws, keep in mind tho
                     
@@ -626,7 +626,7 @@ char baseTreeD3(const std::vector<std::vector<float>>& baseTreeD3_rotationMatrix
             } // M
 
             else { // Unknown
-                std::cout << "Case 4 fail\n";                
+                //std::cout << "Case 4 fail\n";                
                 return '!';
             }
                         
@@ -654,7 +654,7 @@ char baseTreeD2(const std::vector<std::vector<float>>& baseTreeD2_rotationMatrix
             }
 
             else { // Unknown
-                std::cout << "Fail 1 fail\n";
+                //std::cout << "Fail 1 fail\n";
                 return '-';
             }
             
@@ -674,14 +674,14 @@ char baseTreeD2(const std::vector<std::vector<float>>& baseTreeD2_rotationMatrix
             } // I M Y
                 
             else { // Unknown
-                std::cout << "Fail 2 fail\n";
+                //std::cout << "Fail 2 fail\n";
                 return '-';
             }
 
             break;
         
         default:
-            std::cout << "Detection fail\n";
+            //std::cout << "Detection fail\n";
             return '-';
             break;
     }
