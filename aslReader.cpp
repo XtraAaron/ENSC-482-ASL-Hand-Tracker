@@ -308,16 +308,16 @@ char reverseTree(const std::vector<std::vector<float>>& reverseTree_rotationMatr
 
 // Depth of 5 total
 char baseTreeD5(const std::vector<std::vector<float>>& baseTreeD5_rotationMatrix, int combinedResult) {
-    std::cout
-    << " T1 X: " << baseTreeD5_rotationMatrix[1][0]
-    << " T1 Z: " << baseTreeD5_rotationMatrix[1][2]
-    << "\n"; // Debug stuff     
+    //std::cout
+    //<< " T1 X: " << baseTreeD5_rotationMatrix[1][0]
+    //<< " T1 Z: " << baseTreeD5_rotationMatrix[1][2]
+    //<< "\n"; // Debug stuff     
     switch (combinedResult) {
         case 1: 
         // B 7 8
         // I1 FE, R1 FE, P1 FE, I2 FE
         // Individual, B is last case, 7 checks R2 curl, 8 checks M2 curl, B checks both straight
-        std::cout << "Case 1\n";
+        //std::cout << "Case 1\n";
             if (classifyRing2(baseTreeD5_rotationMatrix[10][2]) == CurlState::FULL_CURL) { // Curl R2
                 return '7';
             }
@@ -341,7 +341,7 @@ char baseTreeD5(const std::vector<std::vector<float>>& baseTreeD5_rotationMatrix
         
         // I1 FE, R1 FE, P1 FE, I2 FC
         // Use P3
-        std::cout << "Case 2\n";
+        //std::cout << "Case 2\n";
             if (classifyPinky3(baseTreeD5_rotationMatrix[14][2]) == CurlState::FULL_CURL) { // P2 FC
                 return 'e';
             }
@@ -358,7 +358,7 @@ char baseTreeD5(const std::vector<std::vector<float>>& baseTreeD5_rotationMatrix
         case 3: 
         // K V
         // Use thumb pos
-        std::cout << "Case 3\n";
+        //std::cout << "Case 3\n";
             if (baseTreeD5_rotationMatrix[1][0] >= 0.200 && baseTreeD5_rotationMatrix[1][0] <= 0.350) { // Need fresh one
                 return 'k'; // Add p1 curl to avoid 7 overlap, when testing make sure to test 7
             }
@@ -637,7 +637,6 @@ char baseTreeD3(const std::vector<std::vector<float>>& baseTreeD3_rotationMatrix
             break;
     }
 }
-
 
 char baseTreeD2(const std::vector<std::vector<float>>& baseTreeD2_rotationMatrix, CurlState result1) { // Each level does a decision process
     switch (result1){
